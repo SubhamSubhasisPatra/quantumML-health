@@ -1,9 +1,9 @@
-from code.neuron import *
-from code.encodingsource import *
-from code.hsgs import *
-from code.classical_neuron import *
-from code.classical_pso import *
-from code.sf import *
+from neuron import *
+from encodingsource import *
+from hsgs import *
+from classical_neuron import *
+from classical_pso import *
+from sf import *
 simulator = Aer.get_backend('qasm_simulator')
 import pandas as pd
 import numpy as np
@@ -117,7 +117,7 @@ def experiment_TRAIN(Xs_train, ys_train, lrParameter=0.09, n_epochs=400, seed=1,
             if (trainingBias):
                 inputVector = inputVector + len(inputVector)*[1]
 
-            print(inputVector, y_train)
+            #print(inputVector, y_train)
             
             """
             executando classico

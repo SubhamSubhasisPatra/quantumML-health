@@ -1,7 +1,7 @@
-from code.encodingsource import InitializerUniformlyRotation
-from code.sf import sfGenerator
-from code.hsgs import hsgsGenerator
-from code.classical_pso import PSO
+from encodingsource import InitializerUniformlyRotation
+from sf import sfGenerator
+from hsgs import hsgsGenerator
+from classical_pso import PSO
 import numpy as np
 import math
 import random
@@ -9,9 +9,9 @@ from qiskit import execute, Aer, QuantumRegister, QuantumCircuit, ClassicalRegis
 from sympy.combinatorics.graycode import GrayCode
 # from qiskit.aqua.circuits.gates.multi_control_rotation_gates  import _apply_mcu3_graycode, mcrx
 #from qiskit.aqua.utils.controlled_circuit import apply_cu3
-from code.extrafunctions import *
+from extrafunctions import *
 
-from code.encodingv2 import *
+from encodingv2 import *
 
 np.random.seed(7)
 
