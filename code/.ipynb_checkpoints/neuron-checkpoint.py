@@ -1,7 +1,8 @@
-from encodingsource import InitializerUniformlyRotation
-from sf import sfGenerator
-from hsgs import hsgsGenerator
-from classical_pso import PSO
+from code.encodingsource import InitializerUniformlyRotation
+from code.sf import sfGenerator
+from code.hsgs import hsgsGenerator
+from code.phaseEncoding import phaseEncodingGenerator
+from code.classical_pso import PSO
 import numpy as np
 import math
 import random
@@ -9,9 +10,9 @@ from qiskit import execute, Aer, QuantumRegister, QuantumCircuit, ClassicalRegis
 from sympy.combinatorics.graycode import GrayCode
 # from qiskit.aqua.circuits.gates.multi_control_rotation_gates  import _apply_mcu3_graycode, mcrx
 #from qiskit.aqua.utils.controlled_circuit import apply_cu3
-from extrafunctions import *
+from code.extrafunctions import *
 
-from encodingv2 import *
+from code.encodingv2 import *
 
 np.random.seed(7)
 
@@ -73,19 +74,29 @@ def createNeuron (inputVector, weightVector, circuitGeneratorOfUOperator, ancill
 			hsgsGenerator(inputVectorBinarized, circuit, q_input, n)
 			weightVectorBinarized = deterministicBinarization(weightVector)
 			hsgsGenerator(weightVectorBinarized, circuit, q_input, n)
-	elif circuitGeneratorOfUOperator == "sf":
+                    
+	if circuitGeneratorOfUOperator == "phase-encoding":
 			for i in range(n):
 				circuit.h(q_input[i])
-			sfGenerator(inputVector, circuit, q_input, None, n, q_aux, ancilla)
-			sfGenerator(weightVector, circuit, q_input, None, n, q_aux, ancilla)
+			phaseEncodingGenerator(inputVector, circuit, q_input, n)
+			phaseEncodingGenerator(weightVector, circuit, q_input, n)            
+                
+	elif circuitGeneratorOfUOperator == "sf":
+		for i in range(n):
+			circuit.h(q_input[i])
+		sfGenerator(inputVector, circuit, q_input, None, n, q_aux, ancilla)
+		sfGenerator(weightVector, circuit, q_input, None, n, q_aux, ancilla)
+
 	elif circuitGeneratorOfUOperator == "encoding-weight":
-			encodingGenerator2(weightVector, circuit, q_input)
-			hsgsGenerator(inputVector, circuit, q_input, n)
+		inputVectorBinarized = thresholdBinarization(inputVector)
+		encodingGenerator2(weightVector, circuit, q_input)
+		hsgsGenerator(inputVectorBinarized, circuit, q_input, n)
+            
 	elif circuitGeneratorOfUOperator == "encoding-input":
-			encodingGenerator2(inputVector, circuit, q_input)
-			hsgsGenerator(weightVector, circuit, q_input, n)
+		encodingGenerator2(inputVector, circuit, q_input)
+		hsgsGenerator(weightVector, circuit, q_input, n)
 	else:
-			print("WARNING: nenhum neuronio valido selecionado")
+		print("WARNING: nenhum neuronio valido selecionado")
 
 	for i in range(n):
 		circuit.h(q_input[i])
@@ -99,7 +110,7 @@ def createNeuron (inputVector, weightVector, circuitGeneratorOfUOperator, ancill
 	return circuit
 
 
-def executeNeuron(neuronQuantumCircuit, simulator, threshold=None, nshots=8192):
+def executeNeuron(neuronQuantumCircuit, simulator, threshold=None, nshots=1024):
 	#neuronQuantumCircuit is the return of the function createNeuron
 	#simulator function of a qiskit quantum simulator
 	#expectedOutput is a Python List with expected value

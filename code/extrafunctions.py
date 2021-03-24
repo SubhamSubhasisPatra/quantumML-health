@@ -14,6 +14,18 @@ def deterministicBinarization (w):
     
     return w2
 
+def thresholdBinarization(w, threshold=0.5):
+    # This function makes a Threshold Binarization of a given weights list
+    w2 = [0] * len(w)
+
+    for i in range(len(w)):
+        if w[i] >= threshold:
+            w2[i] = -1
+        else:
+            w2[i] = 1
+    
+    return w2
+
 def hardSigmoid(x):
     result = max(0,min(1,(x+1)/2))
     return result 
