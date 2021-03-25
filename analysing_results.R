@@ -8,16 +8,19 @@ library(ggpubr)
 
 boxplotResults <- function(dataname, xname, yname, title=''){
   
-  df1 <- read_csv(paste0("Mestrado/qneuronreal/testesout/outputs/datasets_accuracy/", dataname, '.csv') )
-  df1$model[df1$model == 'error_classic'] <- 'RWCN'
-  df1$model[df1$model == 'error_classic_bin'] <- 'BWCN'
-  df1$model[df1$model == 'error_encoding'] <- 'RWQN'
-  df1$model[df1$model == 'error_HSGS'] <- 'BWQN'
+  df1 <- read_csv(paste0("results/", dataname, '.csv') )
   
-plot = ggplot(data=df1, aes(x=model, y=error, fill=model)) +
+  df1$acc = 1 - df1$error
+  df1$model[df1$model == 'error_encoding_input'] <- 'RIQN'
+  df1$model[df1$model == 'error_phase_encoding'] <- 'RIWQN'
+  df1$model[df1$model == 'error_encoding_weight'] <- 'RWQN'
+  df1$model[df1$model == 'error_HSGS'] <- 'BWQN'
+  #df1 = df1[df1$model != 'error_HSGS',]
+  
+plot = ggplot(data=df1, aes(x=model, y=acc, fill=model)) +
         geom_boxplot() +
         scale_fill_viridis_d(option = "inferno") +
-        scale_y_continuous(limits = c(0, 0.5))+
+        scale_y_continuous(limits = c(0, 1))+
         #geom_jitter(color="black", size=0.4, alpha=0.9) +
         theme_minimal() +
         theme(
@@ -34,6 +37,24 @@ plot = ggplot(data=df1, aes(x=model, y=error, fill=model)) +
 
   return(plot)
 }
+
+
+
+#==========================
+# V4
+#==========================
+
+
+x1 = boxplotResults('version5/experiments_biased_dataframe', 'with bias', 'Accuracy')
+x1
+
+x2= boxplotResults('version5/experiments_unbiased_dataframe', 'without bias', 'Accuracy')
+x2
+
+d2 = ggarrange(x1, x2, ncol = 2, nrow = 1)
+d2 = annotate_figure(d2, top = text_grob('Dataset 2x2', color = "black", face = "bold", size = 14))
+
+ggsave(paste0('results/version5/left_line_experiments.png'), d2, height = 6, width = 8, units = 'in')
 
 #=============
 # DATASET 2
