@@ -78,8 +78,8 @@ def createNeuron (inputVector, weightVector, circuitGeneratorOfUOperator, ancill
 	elif circuitGeneratorOfUOperator == "phase-encoding":
 			for i in range(n):
 				circuit.h(q_input[i])
-			phaseEncodingGenerator(inputVector, circuit, q_input, n)
-			phaseEncodingGenerator(weightVector, circuit, q_input, n)            
+			phaseEncodingGenerator(inputVector, circuit, q_input, n, q_aux)
+			phaseEncodingGenerator(weightVector, circuit, q_input, n, q_aux)            
                 
 	elif circuitGeneratorOfUOperator == "sf":
 		for i in range(n):

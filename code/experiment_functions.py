@@ -40,7 +40,7 @@ def treinamentoNeuronio(operator, inputVector, weightVector, y_train, lrParamete
         deltaRule(inputVector, weightVector, lr=lrParameter, y_train=y_train, out=resultado)
         return resultado
     elif (operator == "phase-encoding"): 
-        neuron = createNeuron(inputVector, weightVector, operator)
+        neuron = createNeuron(inputVector, weightVector, operator, ancilla=True)
         resultado = executeNeuron(neuron, simulator, threshold=None)
         deltaRule(inputVector, weightVector, lr=lrParameter, y_train=y_train, out=resultado)
         return resultado
@@ -323,6 +323,13 @@ def experiment_TEST(Xs_test, ys_test, weightVectorsEncodingWeight, weightVectors
     errosClassico = []
     errosClassicoBin = []
 
+    outputsHSGS = []
+    outputsEncodingWeight = []
+    outputsEncodingInput = []
+    outputsPhaseEncoding = []
+
+
+
     for i in range(repeat):
         erroHSGS = 0
         erroEncodingWeight = 0
@@ -385,7 +392,7 @@ def experiment_TEST(Xs_test, ys_test, weightVectorsEncodingWeight, weightVectors
 
                 if ("phase-encoding" in testingApproaches):
                     operator = "phase-encoding"
-                    neuron = createNeuron(inputVector, weightVectorsPhaseEncoding[neuronClass], operator)
+                    neuron = createNeuron(inputVector, weightVectorsPhaseEncoding[neuronClass], operator, ancilla=True)
                     resultadoPhaseEncoding1 = executeNeuron(neuron, simulator, threshold=None)
                     if(resultadoPhaseEncoding1 > valorMaiorPhaseEncoding):
                         neuronMaiorPhaseEncoding = neuronClass
@@ -408,10 +415,16 @@ def experiment_TEST(Xs_test, ys_test, weightVectorsEncodingWeight, weightVectors
                         neuronMaiorEncodingInput = neuronClass
                         valorMaiorEncodingInput = resultadoEncodingInput1
 
-
+                if neuronClass == 1:
+                    outputsHSGS.append(resultadoHSGS1)
+                    outputsEncodingWeight.append(resultadoEncodingWeight1)
+                    outputsEncodingInput.append(resultadoEncodingInput1)
+                    outputsPhaseEncoding.append(resultadoPhaseEncoding1)
             """
             erros
             """
+
+
             erroClassico_bin = 0
             if (neuronMaiorClassico != y_train):   
                 erroClassico_bin = 1
@@ -477,6 +490,11 @@ def experiment_TEST(Xs_test, ys_test, weightVectorsEncodingWeight, weightVectors
                 'error_phase_encoding':errosPhaseEncoding,
                 'error_classic':errosClassico,
                 'error_classic_bin':errosClassicoBin,
+               
+                'output_HSGS': outputsHSGS,
+                'output_encoding_weight':outputsEncodingWeight,
+                'output_encoding_input':outputsEncodingInput,
+                'output_phase_encoding':outputsPhaseEncoding,
 
                 'weights_learned_HSGS':weightVectorsHSGS,
                 'weights_learned_encoding_weight':weightVectorsEncodingWeight,

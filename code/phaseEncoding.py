@@ -27,16 +27,15 @@ def findBin(num_dec, n): # Função que tranforma os numeros das posições em s
         num_bin.append(decToBin(num_dec[i], n))
     return num_bin
 
-def makePhaseEncoding1(n, circuit, ctrls, q_aux, q_target): 
-    # Função que aplica uma porta Pauli-Z multi-controlada nos qubits de controle
+def makePhaseEncoding1(angle, n, circuit, ctrls, rotation_ctrl, q_aux, q_target): 
+    # Função que aplica uma porta multi-controlada nos qubits de controle
 
     circuit.ccx(ctrls[0], ctrls[1], q_aux[0])
     for m in range(2, len(ctrls)):
         circuit.ccx(ctrls[m], q_aux[m-2], q_aux[m-1])
     
     #########
-    circuit.mcrz(math.pi, q_aux[n-2], q_target[0])
-    #circuit.cz(q_aux[n-2], q_target[0])
+    circuit.mcrz(angle, rotation_ctrl, q_target)
     
     for m in range(len(ctrls)-1, 1, -1):
         circuit.ccx(ctrls[m], q_aux[m-2], q_aux[m-1])
@@ -68,7 +67,7 @@ def recursive_compute_beta(input_vector, betas):
         output = []
     return betas
             
-def phaseEncodingGenerator(inputVector, circuit, q_input, nSize, q_aux=None, phase1=False):
+def phaseEncodingGenerator(inputVector, circuit, q_input, nSize, q_aux=None, phase1=True, ancila = True):
     """
     PhaseEncoding Sign-Flip Block Algorithm
     
@@ -84,9 +83,9 @@ def phaseEncodingGenerator(inputVector, circuit, q_input, nSize, q_aux=None, pha
     if ancila == True:
         q_aux = QuantumRegister(nSize-1, 'q_aux')
         circuit.add_register(q_aux)
-    """
+    
     positions = []
-        
+    """
     # definindo as posições do vetor onde a amplitude é -1 
     # e tranformando os valores dessas posições em strings binárias
     # conseguindo os estados da base que precisarão ser modificados 
@@ -108,7 +107,11 @@ def phaseEncodingGenerator(inputVector, circuit, q_input, nSize, q_aux=None, pha
         q_bits_controllers = [q_control for q_control in q_input[:nSize-1]]
         q_target = q_input[[nSize-1]]
         if phase1 == True:
-            makePhaseEncoding2(betas[q_basis_state], nSize, circuit, q_input, q_aux, q_target)
+            if (betas[q_basis_state]) == 1:
+                makePhaseEncoding1(betas[q_basis_state], nSize, circuit, q_input, q_bits_controllers, q_aux, q_target[0])
+            else:
+                 for k, angle in enumerate(reversed(betas[q_basis_state])):
+                        makePhaseEncoding1(angle, nSize, circuit, q_input, q_bits_controllers, q_aux, q_target[0])
         else:
             if (betas[q_basis_state]) == 1:
                 circuit.mcrz(betas[q_basis_state][0], q_bits_controllers, q_target[0])
