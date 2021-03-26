@@ -1,0 +1,5 @@
+auc-roc-score,precision_score,recall_score,accuracy_score,model
+0.5,0.5,1.0,0.5,output_HSGS
+0.8494,0.8403361344537815,1.0,0.905,output_encoding_weight
+0.1815,0.3153153153153153,0.35,0.295,output_encoding_input
+0.88285,0.5,1.0,0.5,output_phase_encoding
