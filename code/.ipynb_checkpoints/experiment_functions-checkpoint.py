@@ -60,7 +60,7 @@ EXPERIMENT FUNCTIONS
 
 
 
-def experiment_TRAIN(Xs_train, ys_train, lrParameter=0.09, n_epochs=400, seed=1, trainingBias=True, trainingApproaches={}, error_by_epoch =False, epoch_results = True):
+def experiment_TRAIN(Xs_train, ys_train, lrParameter=0.09, thresholdTrain=None, epochs=400, seed=1, trainingBias=True, trainingApproaches={}, error_by_epoch =False, epoch_results = True):
 
     np.random.seed(seed)
     weightVectorsHSGS = []
@@ -118,13 +118,14 @@ def experiment_TRAIN(Xs_train, ys_train, lrParameter=0.09, n_epochs=400, seed=1,
     resultadoClassico=0
     resultadoClassicoBin=0
     
-    epoch_errosHSGS=[]
-    epoch_errosEncodingWeight = []
-    epoch_errosEncodingInput = []
-    epoch_errosPhaseEncoding = []
+    #epoch_errosHSGS=[]
+    #epoch_errosEncodingWeight = []
+    #epoch_errosEncodingInput = []
+    #epoch_errosPhaseEncoding = []
   
 
     for iteration in range(n_epochs):
+
         erroHSGS = 0
         erroEncodingWeight = 0
         erroEncodingInput = 0
@@ -250,48 +251,60 @@ def experiment_TRAIN(Xs_train, ys_train, lrParameter=0.09, n_epochs=400, seed=1,
             errosClassico.append(1-resultadoClassico)
             errosClassicoBin.append(1-resultadoClassicoBin)
 
-            erroHSGS += abs(1-resultadoHSGS)####abs(resultadoHSGS_bin-y_train)
-            erroEncodingWeight += abs(1-resultadoEncodingWeight)####abs(resultadoEncoding_bin-y_train)
-            erroEncodingInput += abs(1-resultadoEncodingInput)####abs(resultadoEncoding_bin-y_train)
-            erroPhaseEncoding += abs(1-resultadoPhaseEncoding)####abs(resultadoEncoding_bin-y_train)
-            erroClassico += abs(1-resultadoClassico)
-            erroClassicoBin += abs(1-resultadoClassicoBin)
+
             
-        if (erroHSGS < bestErrorHSGS):
-            bestWeightsHSGS = weightVectorsHSGS[:]
-            bestErrorHSGS = erroHSGS
-        
-        if (erroEncodingWeight < bestErrorEncodingWeight):
-            bestWeightsEncodingWeight = weightVectorsEncodingWeight[:]
-            bestErrorEncodingWeight = erroEncodingWeight
-        
-        if (erroEncodingInput < bestErrorEncodingInput):
-            bestWeightsEncodingInput = weightVectorsEncodingInput[:]
-            bestErrorEncodingInput = erroEncodingInput
-                
-        if (erroPhaseEncoding < bestErrorPhaseEncoding):
-            bestWeightsPhaseEncoding = weightVectorsPhaseEncoding[:]
-            bestErrorPhaseEncoding = erroPhaseEncoding
-        
-                
+        if thresholdTrain == None:
+            if (resultadoHSGS < bestErrorHSGS):
+                bestWeightsHSGS = weightVectorsHSGS[:]
+                bestErrorHSGS = resultadoHSGS
+            if (resultadoEncodingWeight < bestErrorEncodingWeight):
+                bestWeightsEncodingWeight = weightVectorsEncodingWeight[:]
+                bestErrorEncodingWeight = resultadoEncodingWeight
+            if (resultadoEncodingInput < bestErrorEncodingInput):
+                bestWeightsEncodingInput = weightVectorsEncodingInput[:]
+                bestErrorEncodingInput = resultadoEncodingInput
+            if (resultadoPhaseEncoding < bestErrorPhaseEncoding):
+                bestWeightsPhaseEncoding = weightVectorsPhaseEncoding[:]
+                bestErrorPhaseEncoding = resultadoPhaseEncoding
+        else:
+            erroHSGS += 1-resultadoHSGS
+            erroEncodingWeight += 1-resultadoEncodingWeight
+            erroEncodingInput += 1-resultadoEncodingInput
+            erroPhaseEncoding += 1-resultadoPhaseEncoding
+            #erroClassico += 1-resultadoClassico
+            #erroClassicoBin += 1-resultadoClassicoBin
+
+            if (erroHSGS < bestErrorHSGS):
+                bestWeightsHSGS = weightVectorsHSGS[:]
+                bestErrorHSGS = erroHSGS
+            if (erroEncodingWeight < bestErrorEncodingWeight):
+                bestWeightsEncodingWeight = weightVectorsEncodingWeight[:]
+                bestErrorEncodingWeight = erroEncodingWeight
+            if (erroEncodingInput < bestErrorEncodingInput):
+                bestWeightsEncodingInput = weightVectorsEncodingInput[:]
+                bestErrorEncodingInput = erroEncodingInput
+            if (erroPhaseEncoding < bestErrorPhaseEncoding):
+                bestWeightsPhaseEncoding = weightVectorsPhaseEncoding[:]
+                bestErrorPhaseEncoding = erroPhaseEncoding           
+                    
         #if (iteration % 90 == 0):
         #    bestWeightsHSGSInTime.append(bestWeightsHSGS)
         #    bestWeightsEncodingWeightInTime.append(bestWeightsEncodingWeight)
         #    bestWeightsEncodingInputInTime.append(bestWeightsEncodingInput)
     
         if epoch_results == True:    
-            print("\nerro HSGS", erroHSGS)
-            print("erro encoding weight", erroEncodingWeight)
-            print("erro encoding input", erroEncodingInput)
-            print("erro phase encoding", erroPhaseEncoding)
-           # print("melhores erros HSGS / Encoding / ", bestErrorHSGS, bestErrorEncoding)
-            print("erro classico", erroClassico)
-            print("erro classico Bin", erroClassicoBin)
+            print("\nerro HSGS", bestErrorHSGS)
+            print("erro encoding weight", bestErrorEncodingWeight)
+            print("erro encoding input", bestErrorEncodingInput)
+            print("erro phase encoding", bestErrorPhaseEncoding)
+            #print("melhores erros HSGS / Encoding / ", bestErrorHSGS, bestErrorEncoding)
+            #print("erro classico", erroClassico)
+            #print("erro classico Bin", erroClassicoBin)
         
-        epoch_errosHSGS.append(erroHSGS)
-        epoch_errosEncodingWeight.append(erroEncodingWeight)
-        epoch_errosEncodingInput.append(erroEncodingInput)
-        epoch_errosPhaseEncoding.append(erroPhaseEncoding)
+        #epoch_errosHSGS.append(erroHSGS)
+        #epoch_errosEncodingWeight.append(erroEncodingWeight)
+        #epoch_errosEncodingInput.append(erroEncodingInput)
+        #epoch_errosPhaseEncoding.append(erroPhaseEncoding)
     
 
 
@@ -301,14 +314,14 @@ def experiment_TRAIN(Xs_train, ys_train, lrParameter=0.09, n_epochs=400, seed=1,
     #print("erros", errosClassico, errosClassicoBin)
 
     if error_by_epoch == True:
-        return epoch_errosHSGS, epoch_errosEncodingWeight, epoch_errosEncodingInput, epoch_errosPhaseEncoding
+        return errosHSGS, errosEncodingWeight, errosEncodingInput, errosPhaseEncoding
     
-    print("\nerro HSGS", erroHSGS)
-    print("erro encoding weight", erroEncodingWeight)
-    print("erro encoding input", erroEncodingInput)
-    print("erro phase encoding", erroPhaseEncoding)
-    print("erro Classico", erroClassico)
-    print("erro classico Bin", erroClassicoBin)
+    print("\nerro HSGS", bestErrorHSGS)
+    print("erro encoding weight", bestErrorEncodingWeight)
+    print("erro encoding input", bestErrorEncodingInput)
+    print("erro phase encoding", bestErrorPhaseEncoding)
+    #print("erro Classico", erroClassico)
+    #print("erro classico Bin", erroClassicoBin)
     
     return bestWeightsEncodingWeight, bestWeightsEncodingInput, bestWeightsPhaseEncoding, bestWeightsHSGS, weightVectorsClassico, weightVectorsClassicoBin
 
@@ -392,7 +405,7 @@ def experiment_TEST(Xs_test, ys_test, weightVectorsEncodingWeight, weightVectors
 
                 if ("phase-encoding" in testingApproaches):
                     operator = "phase-encoding"
-                    neuron = createNeuron(inputVector, weightVectorsPhaseEncoding[neuronClass], operator)
+                    neuron = createNeuron(inputVector, weightVectorsPhaseEncoding[neuronClass], operator, ancilla=True)
                     resultadoPhaseEncoding1 = executeNeuron(neuron, simulator, threshold=None)
                     if(resultadoPhaseEncoding1 > valorMaiorPhaseEncoding):
                         neuronMaiorPhaseEncoding = neuronClass
@@ -415,14 +428,15 @@ def experiment_TEST(Xs_test, ys_test, weightVectorsEncodingWeight, weightVectors
                         neuronMaiorEncodingInput = neuronClass
                         valorMaiorEncodingInput = resultadoEncodingInput1
 
-
+                if neuronClass == 1:
+                    outputsHSGS.append(resultadoHSGS1)
+                    outputsEncodingWeight.append(resultadoEncodingWeight1)
+                    outputsEncodingInput.append(resultadoEncodingInput1)
+                    outputsPhaseEncoding.append(resultadoPhaseEncoding1)
             """
             erros
             """
-            outputsHSGS.append(valorMaiorHSGS)
-            outputsEncodingWeight.append(valorMaiorEncodingWeight)
-            outputsEncodingInput.append(valorMaiorEncodingInput)
-            outputsPhaseEncoding.append(valorMaiorPhaseEncoding)
+
 
             erroClassico_bin = 0
             if (neuronMaiorClassico != y_train):   

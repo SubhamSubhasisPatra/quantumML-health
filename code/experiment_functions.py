@@ -316,12 +316,12 @@ def experiment_TRAIN(Xs_train, ys_train, lrParameter=0.09, thresholdTrain=None, 
     if error_by_epoch == True:
         return errosHSGS, errosEncodingWeight, errosEncodingInput, errosPhaseEncoding
     
-    print("\nerro HSGS", erroHSGS)
-    print("erro encoding weight", erroEncodingWeight)
-    print("erro encoding input", erroEncodingInput)
-    print("erro phase encoding", erroPhaseEncoding)
-    print("erro Classico", erroClassico)
-    print("erro classico Bin", erroClassicoBin)
+    print("\nerro HSGS", bestErrorHSGS)
+    print("erro encoding weight", bestErrorEncodingWeight)
+    print("erro encoding input", bestErrorEncodingInput)
+    print("erro phase encoding", bestErrorPhaseEncoding)
+    #print("erro Classico", erroClassico)
+    #print("erro classico Bin", erroClassicoBin)
     
     return bestWeightsEncodingWeight, bestWeightsEncodingInput, bestWeightsPhaseEncoding, bestWeightsHSGS, weightVectorsClassico, weightVectorsClassicoBin
 
