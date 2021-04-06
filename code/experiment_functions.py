@@ -67,8 +67,7 @@ def experiment_TRAIN(Xs_train, ys_train, lrParameter=0.09, thresholdTrain=None, 
     weightVectorsEncodingWeight = []
     weightVectorsEncodingInput = []
     weightVectorsPhaseEncoding = []
-    weightVectorsClassico = []
-    weightVectorsClassicoBin = []
+
     input_dim = len(Xs_train[0])
 
     if (trainingBias):
@@ -78,8 +77,6 @@ def experiment_TRAIN(Xs_train, ys_train, lrParameter=0.09, thresholdTrain=None, 
             weightVectorsEncodingWeight.append(vRandom.copy()) #.append(deterministicBinarization(np.random.uniform(-1, 1, 2*input_dim)))
             weightVectorsEncodingInput.append(vRandom.copy()) #.append(deterministicBinarization(np.random.uniform(-1, 1, 2*input_dim)))
             weightVectorsPhaseEncoding.append(vRandom.copy()) #.append(deterministicBinarization(np.random.uniform(-1, 1, 2*input_dim)))
-            weightVectorsClassico.append(vRandom.copy())# = weightVectorsHSGS.copy()#.append(deterministicBinarization(np.random.uniform(-1, 1, 2*input_dim)))
-            weightVectorsClassicoBin.append(vRandom.copy()) #= weightVectorsHSGS.copy()#.append(deterministicBinarization(np.random.uniform(-1, 1, 2*input_dim)))
     else:
         for i in range(len(list(set(ys_train)))):
             vRandom = deterministicBinarization(np.random.uniform(-1, 1, input_dim))
@@ -87,17 +84,14 @@ def experiment_TRAIN(Xs_train, ys_train, lrParameter=0.09, thresholdTrain=None, 
             weightVectorsEncodingWeight.append(vRandom.copy()) #= weightVectorsHSGS.copy() #.append(deterministicBinarization(np.random.uniform(-1, 1, input_dim)))
             weightVectorsEncodingInput.append(vRandom.copy()) #= weightVectorsHSGS.copy() #.append(deterministicBinarization(np.random.uniform(-1, 1, input_dim)))
             weightVectorsPhaseEncoding.append(vRandom.copy()) #= weightVectorsHSGS.copy() #.append(deterministicBinarization(np.random.uniform(-1, 1, input_dim)))
-            weightVectorsClassico.append(vRandom.copy()) #= weightVectorsHSGS.copy()#.append(deterministicBinarization(np.random.uniform(-1, 1, 2*input_dim)))
-            weightVectorsClassicoBin.append(vRandom.copy()) #= weightVectorsHSGS.copy()#.append(deterministicBinarization(np.random.uniform(-1, 1, 2*input_dim)))
-            
-   
 
+   
 
     bestWeightsHSGS = []
     bestWeightsEncodingWeight = []
     bestWeightsEncodingInput = []
     bestWeightsPhaseEncoding = []
-    bestWeightsClassico = []
+
     bestErrorHSGS=999999
     bestErrorEncodingWeight = 999999
     bestErrorEncodingInput = 999999
@@ -130,15 +124,11 @@ def experiment_TRAIN(Xs_train, ys_train, lrParameter=0.09, thresholdTrain=None, 
         erroEncodingWeight = 0
         erroEncodingInput = 0
         erroPhaseEncoding = 0
-        erroClassico=0
-        erroClassicoBin=0
 
         errosHSGS=[]
         errosEncodingWeight = []
         errosEncodingInput = []
         errosPhaseEncoding = []
-        errosClassico=[]
-        errosClassicoBin=[]
 
         for posicaoTreinamento in range(tamTreinamento):
             
@@ -148,35 +138,6 @@ def experiment_TRAIN(Xs_train, ys_train, lrParameter=0.09, thresholdTrain=None, 
             if (trainingBias):
                 inputVector = inputVector + len(inputVector)*[1]
 
-            
-            """
-            executando classico
-            """
-            if ("neuronio-classico" in trainingApproaches):
-                operator = "neuronio-classico"
-                resultadoClassico = treinamentoNeuronio(operator = operator, 
-                                                        inputVector= inputVector, 
-                                                        weightVector = weightVectorsClassico[y_train], 
-                                                        y_train=1, 
-                                                        lrParameter=lrParameter)
-
-                norm = np.linalg.norm(weightVectorsClassico[y_train])
-                for i in range(len(weightVectorsClassico[y_train])):
-                    weightVectorsClassico[y_train][i] = round(weightVectorsClassico[y_train][i]/norm,12)
-            """
-            executando classico binarizado
-            """
-            if ( "neuronio-classico-bin" in trainingApproaches):
-                operator = "neuronio-classico-bin"
-                resultadoClassicoBin = treinamentoNeuronio(operator = operator, 
-                                                            inputVector= inputVector, 
-                                                            weightVector = weightVectorsClassicoBin[y_train], 
-                                                            y_train=1, 
-                                                            lrParameter=lrParameter)
-
-                norm = np.linalg.norm(weightVectorsClassicoBin[y_train])
-                for i in range(len(weightVectorsClassicoBin[y_train])):
-                    weightVectorsClassicoBin[y_train][i] = round(weightVectorsClassicoBin[y_train][i]/norm,12)
 
             """
             executando o HSGS
@@ -248,9 +209,6 @@ def experiment_TRAIN(Xs_train, ys_train, lrParameter=0.09, thresholdTrain=None, 
             errosEncodingWeight.append(1-resultadoEncodingWeight)
             errosEncodingInput.append(1-resultadoEncodingInput)
             errosPhaseEncoding.append(1-resultadoPhaseEncoding)
-            errosClassico.append(1-resultadoClassico)
-            errosClassicoBin.append(1-resultadoClassicoBin)
-
 
             
         if thresholdTrain == None:
@@ -271,8 +229,7 @@ def experiment_TRAIN(Xs_train, ys_train, lrParameter=0.09, thresholdTrain=None, 
             erroEncodingWeight += 1-resultadoEncodingWeight
             erroEncodingInput += 1-resultadoEncodingInput
             erroPhaseEncoding += 1-resultadoPhaseEncoding
-            #erroClassico += 1-resultadoClassico
-            #erroClassicoBin += 1-resultadoClassicoBin
+
 
             if (erroHSGS < bestErrorHSGS):
                 bestWeightsHSGS = weightVectorsHSGS[:]
@@ -287,31 +244,13 @@ def experiment_TRAIN(Xs_train, ys_train, lrParameter=0.09, thresholdTrain=None, 
                 bestWeightsPhaseEncoding = weightVectorsPhaseEncoding[:]
                 bestErrorPhaseEncoding = erroPhaseEncoding           
                     
-        #if (iteration % 90 == 0):
-        #    bestWeightsHSGSInTime.append(bestWeightsHSGS)
-        #    bestWeightsEncodingWeightInTime.append(bestWeightsEncodingWeight)
-        #    bestWeightsEncodingInputInTime.append(bestWeightsEncodingInput)
-    
+
         if epoch_results == True:    
             print("\nerro HSGS", bestErrorHSGS)
             print("erro encoding weight", bestErrorEncodingWeight)
             print("erro encoding input", bestErrorEncodingInput)
             print("erro phase encoding", bestErrorPhaseEncoding)
-            #print("melhores erros HSGS / Encoding / ", bestErrorHSGS, bestErrorEncoding)
-            #print("erro classico", erroClassico)
-            #print("erro classico Bin", erroClassicoBin)
-        
-        #epoch_errosHSGS.append(erroHSGS)
-        #epoch_errosEncodingWeight.append(erroEncodingWeight)
-        #epoch_errosEncodingInput.append(erroEncodingInput)
-        #epoch_errosPhaseEncoding.append(erroPhaseEncoding)
-    
 
-
-        #if erroEncoding < limiarErroToleravel and erroHSGS < limiarErroToleravel:
-        #        break
-    #print("erros", errosHSGS, errosEncodingWeight, errosEncodingInput)
-    #print("erros", errosClassico, errosClassicoBin)
 
     if error_by_epoch == True:
         return errosHSGS, errosEncodingWeight, errosEncodingInput, errosPhaseEncoding
@@ -320,9 +259,7 @@ def experiment_TRAIN(Xs_train, ys_train, lrParameter=0.09, thresholdTrain=None, 
     print("erro encoding weight", bestErrorEncodingWeight)
     print("erro encoding input", bestErrorEncodingInput)
     print("erro phase encoding", bestErrorPhaseEncoding)
-    #print("erro Classico", erroClassico)
-    #print("erro classico Bin", erroClassicoBin)
-    
+
     return bestWeightsEncodingWeight, bestWeightsEncodingInput, bestWeightsPhaseEncoding, bestWeightsHSGS, weightVectorsClassico, weightVectorsClassicoBin
 
 
@@ -351,13 +288,13 @@ def experiment_TEST(Xs_test, ys_test, weightVectorsEncodingWeight, weightVectors
         erroClassico =0
         erroClassicoBin=0
 
-        for posicaoTreinamento in range(len(Xs_test)):
-            inputVector = Xs_test[posicaoTreinamento] # inputVectors[posicaoTreinamento]
+        for pos in range(len(Xs_test)):
+            inputVector = Xs_test[pos] # inputVectors[pos]
 
             if bias == True:
                 inputVector = inputVector + len(inputVector)*[1]
 
-            y_train = ys_test[posicaoTreinamento]
+            target = ys_test[pos]
 
             valorMaiorHSGS=0
             neuronMaiorHSGS=0
@@ -371,35 +308,15 @@ def experiment_TEST(Xs_test, ys_test, weightVectorsEncodingWeight, weightVectors
             valorMaiorPhaseEncoding=0
             neuronMaiorPhaseEncoding=0
 
-            valorMaiorClassico =0
-            neuronMaiorClassico=0
-
-            valorMaiorClassicoBin =0
-            neuronMaiorClassicoBin=0
 
             for neuronClass in range(len(list(set(ys_test)))):
-
-                if ("neuronio-classico" in testingApproaches):        
-                    operator="neuronio-classico"    
-                    resultadoClassico = runClassicalNeuronReturnProbability(inputVector, weightVectorsClassico[neuronClass])
-                    if(resultadoClassico>valorMaiorClassico):
-                        neuronMaiorClassico = neuronClass
-                        valorMaiorClassico = resultadoClassico
-
-                if ("neuronio-classico-bin" in testingApproaches):
-                    operator="neuronio-classico-bin"    
-                    wBinaryBinary = deterministicBinarization(weightVectorsClassicoBin[neuronClass]) 
-                    resultadoClassicoBin = runClassicalNeuronReturnProbability(inputVector, wBinaryBinary)
-                    if(resultadoClassicoBin>valorMaiorClassicoBin):
-                        neuronMaiorClassicoBin = neuronClass
-                        valorMaiorClassicoBin = resultadoClassicoBin
 
                 if ("hsgs" in testingApproaches):
                     operator = "hsgs"
                     wBinaryBinary = deterministicBinarization(weightVectorsHSGS[neuronClass]) # Binarization of Real weights
                     neuron = createNeuron(inputVector, wBinaryBinary, operator)
                     resultadoHSGS1 = executeNeuron(neuron, simulator, threshold=None)
-                    if(resultadoHSGS1>valorMaiorHSGS):
+                    if(resultadoHSGS1 > valorMaiorHSGS):
                         neuronMaiorHSGS = neuronClass
                         valorMaiorHSGS = resultadoHSGS1
 
@@ -428,71 +345,57 @@ def experiment_TEST(Xs_test, ys_test, weightVectorsEncodingWeight, weightVectors
                         neuronMaiorEncodingInput = neuronClass
                         valorMaiorEncodingInput = resultadoEncodingInput1
 
+                # get predicted probability results
                 if neuronClass == 1:
                     outputsHSGS.append(resultadoHSGS1)
                     outputsEncodingWeight.append(resultadoEncodingWeight1)
                     outputsEncodingInput.append(resultadoEncodingInput1)
                     outputsPhaseEncoding.append(resultadoPhaseEncoding1)
+
+            ##################################################
             """
             erros
             """
 
 
-            erroClassico_bin = 0
-            if (neuronMaiorClassico != y_train):   
-                erroClassico_bin = 1
-
-            erroClassicoBin_bin = 0
-            if (neuronMaiorClassicoBin != y_train):   
-                erroClassicoBin_bin = 1
-
             erroHSGS_bin = 0
-            if (neuronMaiorHSGS != y_train):   
+            if (neuronMaiorHSGS != target):   
                 erroHSGS_bin = 1
 
             erroEncodingWeight_bin = 0
-            if (neuronMaiorEncodingWeight != y_train):   
+            if (neuronMaiorEncodingWeight != target):   
                 erroEncodingWeight_bin = 1
 
             erroEncodingInput_bin = 0
-            if (neuronMaiorEncodingInput != y_train):   
+            if (neuronMaiorEncodingInput != target):   
                 erroEncodingInput_bin = 1
 
             erroPhaseEncoding_bin = 0
-            if (neuronMaiorPhaseEncoding != y_train):   
+            if (neuronMaiorPhaseEncoding != target):   
                 erroPhaseEncoding_bin = 1
 
-            #print("classe", y_train, "HSGS", neuronMaiorHSGS ,"ENCODING", neuronMaiorEncoding)
-            #print("classe", y_train, "Classico", neuronMaiorClassico, "Classico Bin", neuronMaiorClassicoBin)
 
             erroHSGS += erroHSGS_bin####abs(resultadoHSGS_bin-y_train)
             erroEncodingWeight += erroEncodingWeight_bin####abs(resultadoEncoding_bin-y_train)
             erroEncodingInput += erroEncodingInput_bin####abs(resultadoEncoding_bin-y_train)
             erroPhaseEncoding += erroPhaseEncoding_bin####abs(resultadoEncoding_bin-y_train)
-            erroClassico += erroClassico_bin####abs(resultadoEncoding_bin-y_train)
-            erroClassicoBin += erroClassicoBin_bin####abs(resultadoEncoding_bin-y_train)
+ 
 
         print("erro HSGS", erroHSGS/len(Xs_test))
         print("erro encoding weight", erroEncodingWeight/len(Xs_test))
         print("erro encoding input", erroEncodingInput/len(Xs_test))
         print("erro phase encoding", erroPhaseEncoding/len(Xs_test))
-        print("erro classico", erroClassico/len(Xs_test))
-        print("erro classico bin", erroClassicoBin/len(Xs_test))
 
 
         errosHSGS.append(round(erroHSGS/len(Xs_test), 4))
         errosEncodingWeight.append(round(erroEncodingWeight/len(Xs_test), 4))
         errosEncodingInput.append(round(erroEncodingInput/len(Xs_test), 4))
         errosPhaseEncoding.append(round(erroPhaseEncoding/len(Xs_test), 4))
-        errosClassico.append(round(erroClassico/len(Xs_test),4))
-        errosClassicoBin.append(round(erroClassicoBin/len(Xs_test),4))
 
     print("ERROS HSGS            ",  np.average(errosHSGS))
     print("ERROS ENCODING WEIGHT ",  np.average(errosEncodingWeight))
     print("ERROS ENCODING INPUT  ",  np.average(errosEncodingInput))
     print("ERROS PHASE ENCODING  ",  np.average(errosPhaseEncoding))
-    print("ERROS Classico        ",  np.average(errosClassico))
-    print("ERROS Classico Bin    ",  np.average(errosClassicoBin))
 
     """
     results and metrics
