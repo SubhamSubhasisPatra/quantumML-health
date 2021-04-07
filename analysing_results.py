@@ -4,6 +4,90 @@ import os
 import pandas as pd
 
 
+#=============================
+# results threshold
+#=============================
+with open('data/left_test.json') as f:
+    x = json.load(f)
+    
+
+def getData(selecta, selectb, path='version5/experiments_unbiased'):
+
+    with open('results/'+path+'.json') as f:
+        data = json.load(f)
+
+    # get outputs for 1st test 
+    outputs = ['output_encoding_weight', 'output_encoding_input', 'output_phase_encoding']
+    outdata = {}
+    for i in outputs:
+        outdata[i] = data[i][selecta:selectb]
+    outdata = pd.DataFrame(outdata)
+
+    # get true values
+    with open('data/left_test.json') as f:
+        outdata['test_xor'] = json.load(f)['flag']
+    
+    return outdata
+
+def searchThreshold(models, output_data, search_space=None):
+    # THRESHOLD SEARCH
+    model_best = {'model':[], 'threshold':[], 'accuracy':[]}
+
+    for model in models:
+        model_search = {}
+        if search_space == None:
+            search = [0.25, 0.3, 0.35, 0.4, 0.45, 0.50, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95]
+        else:
+            search = [search_space[models.index(model)]]
+        for threshold in search:
+        # get predictions based on threshold
+            preds = [1 if x >= threshold else 0 for x in output_data[model]]
+            if search_space != None:
+                right = list(map(lambda x, y:  1 if x == y else 0, output_data['test_xor'], preds))
+                model_search[threshold] = sum(right)/len(right)
+            else:
+                if sum(preds) >= int(len(preds)/20): # se pelo menos 5% dos casos foram previstos como 1, continue
+                    # get accuracy
+                    right = list(map(lambda x, y:  1 if x == y else 0, output_data['test_xor'], preds))
+                    model_search[threshold] = sum(right)/len(right)
+        # get threshold with the max value
+        model_best['model'].append(model)
+        if search_space == None:
+            model_best['threshold'].append(max(model_search, key=model_search.get))
+            model_best['accuracy'].append(max(model_search.values()))
+        else:
+            print(model_search)
+            model_best['threshold'].append(list(model_search.keys())[0])
+            model_best['accuracy'].append(list(model_search.values())[0] )         
+
+    return pd.DataFrame(model_best)
+
+
+outputs = ['output_encoding_weight', 'output_encoding_input', 'output_phase_encoding']
+
+outdata = getData(0,200)
+s1 = searchThreshold(outputs, outdata)
+
+geta = 200
+getb = 400
+for i in range(9):
+    outdata2 = getData(geta, getb)
+    s2 = searchThreshold(outputs, outdata2, [0.25, 0.5, 0.4])
+    s1 = pd.concat([s1, s2])
+    geta += 200
+    getb += 200
+
+
+s1.to_csv('results/version5/unbiased_outdata.csv')
+
+
+
+#=============================
+# error by epoch
+#=============================
+
+#===================================================================
+
 def readAndResults(i):
     with open('testesout/outputs/'+i) as f:
         data = json.load(f)
