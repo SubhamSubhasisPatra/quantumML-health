@@ -60,7 +60,7 @@ EXPERIMENT FUNCTIONS
 
 
 
-def experiment_TRAIN(Xs_train, ys_train, lrParameter=0.09, thresholdTrain=None, epochs=400, seed=1, trainingBias=True, trainingApproaches={}, error_by_epoch =False, epoch_results = True):
+def experiment_TRAIN(Xs_train, ys_train, lrParameter=0.09, thresholdTrain=None, n_epochs=400, seed=1, trainingBias=True, trainingApproaches={}, error_by_epoch =False, epoch_results = True):
 
     np.random.seed(seed)
     weightVectorsHSGS = []
@@ -260,10 +260,10 @@ def experiment_TRAIN(Xs_train, ys_train, lrParameter=0.09, thresholdTrain=None, 
     print("erro encoding input", bestErrorEncodingInput)
     print("erro phase encoding", bestErrorPhaseEncoding)
 
-    return bestWeightsEncodingWeight, bestWeightsEncodingInput, bestWeightsPhaseEncoding, bestWeightsHSGS, weightVectorsClassico, weightVectorsClassicoBin
+    return bestWeightsEncodingWeight, bestWeightsEncodingInput, bestWeightsPhaseEncoding, bestWeightsHSGS
 
 
-def experiment_TEST(Xs_test, ys_test, weightVectorsEncodingWeight, weightVectorsEncodingInput, weightVectorsPhaseEncoding, weightVectorsHSGS, weightVectorsClassico, weightVectorsClassicoBin,  thresholdParameter=0.5, lrParameter=0.1, repeat=30, bias=True, testingApproaches={}):
+def experiment_TEST(Xs_test, ys_test, weightVectorsEncodingWeight, weightVectorsEncodingInput, weightVectorsPhaseEncoding, weightVectorsHSGS,  thresholdParameter=0.5, lrParameter=0.1, repeat=30, bias=True, testingApproaches={}):
     
     
     errosHSGS = []
@@ -404,8 +404,6 @@ def experiment_TEST(Xs_test, ys_test, weightVectorsEncodingWeight, weightVectors
                 'error_encoding_weight':errosEncodingWeight,
                 'error_encoding_input':errosEncodingInput,
                 'error_phase_encoding':errosPhaseEncoding,
-                'error_classic':errosClassico,
-                'error_classic_bin':errosClassicoBin,
                
                 'output_HSGS': outputsHSGS,
                 'output_encoding_weight':outputsEncodingWeight,
@@ -415,8 +413,6 @@ def experiment_TEST(Xs_test, ys_test, weightVectorsEncodingWeight, weightVectors
                 'weights_learned_HSGS':weightVectorsHSGS,
                 'weights_learned_encoding_weight':weightVectorsEncodingWeight,
                 'weights_learned_encoding_input':weightVectorsEncodingInput,
-                'weights_learned_phase_encoding':weightVectorsPhaseEncoding,
-                'weights_learned_classic':weightVectorsClassico,
-                'weights_learned_classic_bin':weightVectorsClassicoBin    
+                'weights_learned_phase_encoding':weightVectorsPhaseEncoding
         }
     return results
