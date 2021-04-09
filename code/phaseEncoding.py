@@ -48,24 +48,19 @@ def makePhaseEncoding2(angle, n, circuit, ctrls, q_aux, q_target):
     circuit.mcrz(angle, q_aux[n-2], q_target[0])    
     return circuit
 
-def recursive_compute_beta(input_vector, betas):
-    if len(input_vector) > 1:
-        new_x = []
-        beta = []
-        for k in range(0, len(input_vector), 2):
-            norm = np.sqrt(input_vector[k] ** 2 + input_vector[k + 1] ** 2)
-            new_x.append(norm)
-            if norm == 0:
-                beta.append(0)
-            else:
-                if input_vector[k] < 0:
-                    beta.append(2 * np.pi - 2 * np.arcsin(input_vector[k + 1] / norm)) ## testing
-                else:
-                    beta.append(2 * np.arcsin(input_vector[k + 1] / norm))
-        recursive_compute_beta(new_x, betas)
-        betas.append(beta)
-        output = []
-    return betas
+def normalizePi(input_vector):
+    ''' vector normalization for values between 0 and 1
+    '''
+    
+    normalized_vector=[]
+
+    for value in input_vector:
+        new_value = ((value-0)/(1-0))*np.pi
+        normalized_vector.append(new_value)
+    
+    return normalized_vector
+
+
             
 def phaseEncodingGenerator(inputVector, circuit, q_input, nSize, q_aux=None, phase1=True, ancila = True):
     """
@@ -93,32 +88,23 @@ def phaseEncodingGenerator(inputVector, circuit, q_input, nSize, q_aux=None, pha
     #pos_binary = findBin(positions, nSize)
     
     # compute angles
-    betas = []
-    betas = recursive_compute_beta(inputVector, betas)
+    betas = normalizePi(inputVector)
 
     # laço para percorrer cada estado base em pos_binay
     for q_basis_state in range(len(betas)):
+
         # pegando cada posição da string do estado onde o bit é 0
         # aplicando uma porta Pauli-X para invertê-lo
         for indice_position in range(nSize):
             circuit.x(q_input[indice_position])
         
-        # aplicando porta Pauli-Z multi-controlada entres os qubits em q_input
+        # identificando controles
         q_bits_controllers = [q_control for q_control in q_input[:nSize-1]]
         q_target = q_input[[nSize-1]]
-        if phase1 == True:
-            if (betas[q_basis_state]) == 1:
-                makePhaseEncoding1(betas[q_basis_state], nSize, circuit, q_input, q_bits_controllers, q_aux, q_target[0])
-            else:
-                 for k, angle in enumerate(reversed(betas[q_basis_state])):
-                        makePhaseEncoding1(angle, nSize, circuit, q_input, q_bits_controllers, q_aux, q_target[0])
-        else:
-            if (betas[q_basis_state]) == 1:
-                circuit.mcrz(betas[q_basis_state][0], q_bits_controllers, q_target[0])
-            else:
-                 for k, angle in enumerate(reversed(betas[q_basis_state])):
-                    circuit.mcrz(angle, q_bits_controllers, q_target[0])
         
+        # aplica phase encoding
+        makePhaseEncoding1(betas[q_basis_state], nSize, circuit, q_input, q_bits_controllers, q_aux, q_target[0])
+
         # desfazendo a aplicação da porta Pauli-X nos mesmos qubits
         for indice_position in range(nSize):
                 circuit.x(q_input[indice_position])
