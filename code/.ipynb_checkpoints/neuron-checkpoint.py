@@ -75,11 +75,11 @@ def createNeuron (inputVector, weightVector, circuitGeneratorOfUOperator, ancill
 			weightVectorBinarized = deterministicBinarization(weightVector)
 			hsgsGenerator(weightVectorBinarized, circuit, q_input, n)
                     
-	if circuitGeneratorOfUOperator == "phase-encoding":
+	elif circuitGeneratorOfUOperator == "phase-encoding":
 			for i in range(n):
 				circuit.h(q_input[i])
-			phaseEncodingGenerator(inputVector, circuit, q_input, n)
-			phaseEncodingGenerator(weightVector, circuit, q_input, n)            
+			phaseEncodingGenerator(inputVector, circuit, q_input, n, q_aux=q_aux)
+			phaseEncodingGenerator(weightVector, circuit, q_input, n, q_aux=q_aux)            
                 
 	elif circuitGeneratorOfUOperator == "sf":
 		for i in range(n):
@@ -95,6 +95,7 @@ def createNeuron (inputVector, weightVector, circuitGeneratorOfUOperator, ancill
 	elif circuitGeneratorOfUOperator == "encoding-input":
 		encodingGenerator2(inputVector, circuit, q_input)
 		hsgsGenerator(weightVector, circuit, q_input, n)
+		
 	else:
 		print("WARNING: nenhum neuronio valido selecionado")
 
