@@ -10,31 +10,14 @@ import numpy as np
 import random
 import math
 
-def decToBin(num, n):# Função para transformar um numero decimal numa string binária de tamanho n
-    num_bin = bin(num)[2:].zfill(n)
-    return num_bin
-
-def findDec(input_vector, n): # Fução que pega as posições dos fatores -1 do vetor de entrada
-    num_dec = []
-    for i in range(0, len(input_vector)):
-        if input_vector[i] == -1:
-            num_dec.append(i)
-    return num_dec
-
-def findBin(num_dec, n): # Função que tranforma os numeros das posições em strings binarias
-    num_bin = []
-    for i in range(0, len(num_dec)):
-        num_bin.append(decToBin(num_dec[i], n))
-    return num_bin
 
 def makePhaseEncoding1(angle, n, circuit, ctrls, rotation_ctrl, q_aux, q_target): 
-    # Função que aplica uma porta multi-controlada nos qubits de controle
+    # Funcao que aplica uma rotacao multi-controlada nos qubits de controle
 
     circuit.ccx(ctrls[0], ctrls[1], q_aux[0])
     for m in range(2, len(ctrls)):
         circuit.ccx(ctrls[m], q_aux[m-2], q_aux[m-1])
     
-    #########
     circuit.mcrz(angle, rotation_ctrl, q_target)
     
     for m in range(len(ctrls)-1, 1, -1):
@@ -44,9 +27,24 @@ def makePhaseEncoding1(angle, n, circuit, ctrls, rotation_ctrl, q_aux, q_target)
     return circuit
 
 def makePhaseEncoding2(angle, n, circuit, ctrls, q_aux, q_target): 
-    # Função que aplica uma porta Pauli-Z multi-controlada nos qubits de controle
+    # Funcao que aplica uma rotacao multi-controlada nos qubits de controle
     circuit.mcrz(angle, q_aux[n-2], q_target[0])    
     return circuit
+
+
+def makePhaseEncoding3(angle, n, circuit, ctrls, q_aux, q_target): 
+    # Funcao que aplica uma rotacao multi-controlada nos qubits de controle
+    m=0
+    circuit.ccx(ctrls[0], ctrls[1], qaux[0])
+    for m in range(2, len(ctrls)):
+        circuit.ccx(ctrls[m], qaux[m-2], qaux[m-1])
+    
+    circuit.mcrz(angle, qaux[len(ctrls)-2], q_target)
+    
+    for m in range(len(ctrls)-1, 1, -1):
+        circuit.ccx(ctrls[m], qaux[m-2], qaux[m-1])
+    circuit.ccx(ctrls[0], ctrls[1], qaux[0])
+
 
 def normalizePi(input_vector):
     ''' vector normalization for values between 0 and 1
