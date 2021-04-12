@@ -7,13 +7,13 @@ import pandas as pd
 #=============================
 # results threshold
 #=============================
-with open('data/left_test.json') as f:
-    x = json.load(f)
-    
 
-def getData(selecta, selectb, path='version5/experiments_unbiased'):
+experiment_path = 'results/version6/'
+target_test = 'test_xor'
 
-    with open('results/'+path+'.json') as f:
+def getData(selecta, selectb, experiment_path, experiment, target_test):
+
+    with open(experiment_path+experiment+'.json') as f:
         data = json.load(f)
 
     # get outputs for 1st test 
@@ -24,8 +24,8 @@ def getData(selecta, selectb, path='version5/experiments_unbiased'):
     outdata = pd.DataFrame(outdata)
 
     # get true values
-    with open('data/left_test.json') as f:
-        outdata['test_xor'] = json.load(f)['flag']
+    with open(experiment_path + target_test +'.json') as f:
+        outdata['flag'] = json.load(f)[1]
     
     return outdata
 
@@ -43,12 +43,12 @@ def searchThreshold(models, output_data, search_space=None):
         # get predictions based on threshold
             preds = [1 if x >= threshold else 0 for x in output_data[model]]
             if search_space != None:
-                right = list(map(lambda x, y:  1 if x == y else 0, output_data['test_xor'], preds))
+                right = list(map(lambda x, y:  1 if x == y else 0, output_data['flag'], preds))
                 model_search[threshold] = sum(right)/len(right)
             else:
                 if sum(preds) >= int(len(preds)/20): # se pelo menos 5% dos casos foram previstos como 1, continue
                     # get accuracy
-                    right = list(map(lambda x, y:  1 if x == y else 0, output_data['test_xor'], preds))
+                    right = list(map(lambda x, y:  1 if x == y else 0, output_data['flag'], preds))
                     model_search[threshold] = sum(right)/len(right)
         # get threshold with the max value
         model_best['model'].append(model)
@@ -63,22 +63,30 @@ def searchThreshold(models, output_data, search_space=None):
     return pd.DataFrame(model_best)
 
 
-outputs = ['output_encoding_weight', 'output_encoding_input', 'output_phase_encoding']
 
-outdata = getData(0,200)
-s1 = searchThreshold(outputs, outdata)
+def runSearch(range_value, experiment_path, experiment, target_test):
 
-geta = 200
-getb = 400
-for i in range(9):
-    outdata2 = getData(geta, getb)
-    s2 = searchThreshold(outputs, outdata2, [0.25, 0.5, 0.4])
-    s1 = pd.concat([s1, s2])
-    geta += 200
-    getb += 200
+    outputs = ['output_encoding_weight', 'output_encoding_input', 'output_phase_encoding']
+
+    outdata = getData(0, range_value, experiment_path, experiment, target_test)
+    s1 = searchThreshold(outputs, outdata)
+
+    geta = range_value
+    getb = range_value*2
+    for i in range(9):
+        outdata2 = getData(0, range_value, experiment_path, experiment, target_test)
+        s2 = searchThreshold(outputs, outdata2, list(s1.threshold))
+        s1 = pd.concat([s1, s2])
+        geta += range_value
+        getb += range_value
+
+    s1.to_csv(experiment_path+experiment+'_search.csv', index=False)
+
+    return s1
 
 
-s1.to_csv('results/version5/unbiased_outdata.csv')
+runSearch(66, experiment_path, 'experiments_unbiased', target_test)
+runSearch(66, experiment_path, 'experiments_biased', target_test)
 
 
 
