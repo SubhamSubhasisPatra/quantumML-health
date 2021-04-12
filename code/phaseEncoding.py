@@ -92,7 +92,7 @@ def phaseEncodingGenerator(inputVector, circuit, q_input, nSize, q_aux=None, pha
     """
     
     # normalizacao Pi para o input_vector
-    inputVector = normalizePi(normalizePi)
+    inputVector = normalizePi(inputVector)
         
     # definindo as possicioes do vetor onde a amplitude = -1 
     # e tranformando os valores dessas posicoes em strings binarias
