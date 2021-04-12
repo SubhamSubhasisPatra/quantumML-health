@@ -8,9 +8,6 @@ import pandas as pd
 # results threshold
 #=============================
 
-experiment_path = 'results/version6/'
-target_test = 'test_xor'
-
 def getData(selecta, selectb, experiment_path, experiment, target_test):
 
     with open(experiment_path+experiment+'.json') as f:
@@ -84,6 +81,9 @@ def runSearch(range_value, experiment_path, experiment, target_test):
 
     return s1
 
+
+experiment_path = 'results/version6/'
+target_test = 'test_xor'
 
 runSearch(66, experiment_path, 'experiments_unbiased', target_test)
 runSearch(66, experiment_path, 'experiments_biased', target_test)
