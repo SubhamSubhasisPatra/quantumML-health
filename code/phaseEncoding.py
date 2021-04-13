@@ -116,8 +116,8 @@ def phaseEncodingGenerator(inputVector, circuit, q_input, nSize, q_aux=None, pha
         
         # make phase encoding
         #makePhaseEncodingV1(inputVector[pi_angle_pos], nSize, circuit, q_input, q_aux, q_target, q_bits_controllers)
-        #makePhaseEncodingV2(inputVector[pi_angle_pos], nSize, circuit, q_input, q_aux, q_target)
-        makePhaseEncodingV3(inputVector[pi_angle_pos], circuit, q_target, q_bits_controllers)
+        makePhaseEncodingV2(inputVector[pi_angle_pos], nSize, circuit, q_input, q_aux, q_target)
+        #makePhaseEncodingV3(inputVector[pi_angle_pos], circuit, q_target, q_bits_controllers)
         pi_angle_pos+=1
         
         # desfazendo a aplicação da porta Pauli-X nos mesmos qubits
