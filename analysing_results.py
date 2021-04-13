@@ -1,4 +1,3 @@
-
 import json 
 import os
 import pandas as pd
@@ -82,11 +81,11 @@ def runSearch(range_value, experiment_path, experiment, target_test):
     return s1
 
 
-experiment_path = 'results/version6/'
-target_test = 'test_xor'
+experiment_path = 'results/version4/'
+target_test = 'test_data'
 
-runSearch(66, experiment_path, 'experiments_unbiased', target_test)
-runSearch(66, experiment_path, 'experiments_biased', target_test)
+runSearch(192, experiment_path, 'experiments_unbiased', target_test)
+runSearch(192, experiment_path, 'experiments_biased', target_test)
 
 
 
