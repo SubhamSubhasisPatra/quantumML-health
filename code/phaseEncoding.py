@@ -84,7 +84,6 @@ def phaseEncodingGenerator(inputVector, circuit, q_input, nSize, q_aux=None, pha
     PhaseEncoding Sign-Flip Block Algorithm
     
     inputVector is a Python list 
-    eg. inputVector=[1, -1, 1, 1]
     nSize is the input size
 
     this functions returns the quantum circuit that generates the quantum state 
@@ -94,8 +93,8 @@ def phaseEncodingGenerator(inputVector, circuit, q_input, nSize, q_aux=None, pha
     # normalizacao Pi para o input_vector
     inputVector = normalizePi(inputVector)
         
-    # definindo as possicioes do vetor onde a amplitude = -1 
-    # e tranformando os valores dessas posicoes em strings binarias
+    # seleciona as possicioes do vetor 
+    # e tranforma os valores dessas posicoes em strings binarias
     # conseguindo os estados da base que precisarao ser modificados 
     
     positions = list(range(len(inputVector)))

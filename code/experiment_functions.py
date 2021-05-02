@@ -41,7 +41,7 @@ def treinamentoNeuronio(operator, inputVector, weightVector, y_train, lrParamete
         return resultado
     elif (operator == "phase-encoding"): 
         neuron = createNeuron(inputVector, weightVector, operator, ancilla=True)
-        resultado = executeNeuron(neuron, simulator, threshold=None)
+        resultado = 1 - (executeNeuron(neuron, simulator, threshold=None))
         deltaRule(inputVector, weightVector, lr=lrParameter, y_train=y_train, out=resultado)
         return resultado
     elif (operator == "neuronio-classico"):
