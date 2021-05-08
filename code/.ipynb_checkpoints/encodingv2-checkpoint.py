@@ -23,7 +23,7 @@ class Encoding:
         self.qcircuit = circuit
         
         if encode_type == 'amplitude_encoding':
-            self.amplitude_encoding(input_vector, q_input)
+            self.amplitude_encoding(input_vector, q_input)            
         if encode_type == 'qubit_encoding':
             self.qubit_encoding(input_vector)
         if encode_type == 'dc_amplitude_encoding':
@@ -92,6 +92,7 @@ class Encoding:
         newx = np.copy(input_vector)
         betas = []
         Encoding._recursive_compute_beta(newx, betas)
+        print(betas)
         self._generate_circuit(betas, self.qcircuit, self.quantum_data)
 
     def dc_amplitude_encoding(self, input_vector):
@@ -148,8 +149,7 @@ class Encoding:
                 control_bits.append(quantum_input[self.num_qubits-1])
             else:
                 for k, angle in enumerate(reversed(angles)):
-                    Encoding._index(k, qcircuit, control_bits, numberof_controls)
-
+                    Encoding._index(k, qcircuit, control_bits, numberof_controls) 
                     qcircuit.mcry(angle,
                                   control_bits,
                                   quantum_input[self.num_qubits - 1 - numberof_controls],

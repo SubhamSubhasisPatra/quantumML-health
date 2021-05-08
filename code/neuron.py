@@ -61,11 +61,15 @@ def createNeuron (inputVector, weightVector, circuitGeneratorOfUOperator, ancill
 	circuit.add_register(q_output)
 	circuit.add_register(c_output)
     
-	if ancilla == True:
-		q_aux = QuantumRegister(n-1, 'q_aux')
+	if n-1 == 0:
+		q_aux = QuantumRegister(1, 'q_aux')
 		circuit.add_register(q_aux)
-	else:
-		q_aux = None
+	else:        
+		if ancilla == True:
+			q_aux = QuantumRegister(n-1, 'q_aux')
+			circuit.add_register(q_aux)
+		else:
+			q_aux = None
         
 	if circuitGeneratorOfUOperator == "hsgs":
 			for i in range(n):

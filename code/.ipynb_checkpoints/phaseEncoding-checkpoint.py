@@ -84,7 +84,6 @@ def phaseEncodingGenerator(inputVector, circuit, q_input, nSize, q_aux=None, pha
     PhaseEncoding Sign-Flip Block Algorithm
     
     inputVector is a Python list 
-    eg. inputVector=[1, -1, 1, 1]
     nSize is the input size
 
     this functions returns the quantum circuit that generates the quantum state 
@@ -94,8 +93,8 @@ def phaseEncodingGenerator(inputVector, circuit, q_input, nSize, q_aux=None, pha
     # normalizacao Pi para o input_vector
     inputVector = normalizePi(inputVector)
         
-    # definindo as possicioes do vetor onde a amplitude = -1 
-    # e tranformando os valores dessas posicoes em strings binarias
+    # seleciona as possicioes do vetor 
+    # e tranforma os valores dessas posicoes em strings binarias
     # conseguindo os estados da base que precisarao ser modificados 
     
     positions = list(range(len(inputVector)))
@@ -115,9 +114,9 @@ def phaseEncodingGenerator(inputVector, circuit, q_input, nSize, q_aux=None, pha
         q_target = q_input[[nSize-1]]
         
         # make phase encoding
-        makePhaseEncodingV1(inputVector[pi_angle_pos], nSize, circuit, q_input, q_aux, q_target, q_bits_controllers)
+        #makePhaseEncodingV1(inputVector[pi_angle_pos], nSize, circuit, q_input, q_aux, q_target, q_bits_controllers)
         #makePhaseEncodingV2(inputVector[pi_angle_pos], nSize, circuit, q_input, q_aux, q_target)
-        #makePhaseEncodingV3(inputVector[pi_angle_pos], circuit, q_target, q_bits_controllers)
+        makePhaseEncodingV3(inputVector[pi_angle_pos], circuit, q_target, q_bits_controllers)
         pi_angle_pos+=1
         
         # desfazendo a aplicação da porta Pauli-X nos mesmos qubits
