@@ -30,7 +30,7 @@ def findBin(num_dec, n): # Função que tranforma os numeros das posições em s
     return num_bin
 
 
-def makePhaseEncodingV1(pi_angle, n, circuit, ctrls, q_aux, q_target, q_bits_controllers): # Função que aplica uma porta Pauli-Z multi-controlada nos qubits de controle
+def makePhaseEncodingV1(pi_angle, n, circuit, ctrls, q_aux, q_target, q_bits_controllers): 
 
     circuit.ccx(ctrls[0], ctrls[1], q_aux[0])
     for m in range(2, len(ctrls)):
@@ -43,6 +43,7 @@ def makePhaseEncodingV1(pi_angle, n, circuit, ctrls, q_aux, q_target, q_bits_con
     circuit.ccx(ctrls[0], ctrls[1], q_aux[0])
 
     return circuit
+
 
 def makePhaseEncodingV2(pi_angle, n, circuit, ctrls, q_aux, q_target): 
     
@@ -58,12 +59,29 @@ def makePhaseEncodingV2(pi_angle, n, circuit, ctrls, q_aux, q_target):
 
     return circuit
 
+
 def makePhaseEncodingV3(pi_angle, circuit, q_target, q_bits_controllers): 
- 
+     
     circuit.mcrz(pi_angle, q_bits_controllers, q_target[0])
     
     return circuit
     
+
+def makePhaseEncodingVBin(pi_angle, n, circuit, ctrls, q_aux, q_target): 
+         
+    circuit.cx(ctrls[0], q_aux[0])
+    for m in range(2, len(ctrls)):
+        circuit.cx(ctrls[m], q_aux[m-1])
+        
+    circuit.rz(pi_angle, q_target[0])
+
+    for m in range(len(ctrls)-1, 1, -1):
+        circuit.cx(ctrls[m], q_aux[m-1])
+    circuit.cx(ctrls[0], q_aux[0])
+
+    return circuit
+    
+
     
 def normalizePi(input_vector):
     ''' Pi vector normalization for values between 0 and 1
@@ -84,7 +102,6 @@ def phaseEncodingGenerator(inputVector, circuit, q_input, nSize, q_aux=None, pha
     PhaseEncoding Sign-Flip Block Algorithm
     
     inputVector is a Python list 
-    eg. inputVector=[1, -1, 1, 1]
     nSize is the input size
 
     this functions returns the quantum circuit that generates the quantum state 
@@ -94,8 +111,8 @@ def phaseEncodingGenerator(inputVector, circuit, q_input, nSize, q_aux=None, pha
     # normalizacao Pi para o input_vector
     inputVector = normalizePi(inputVector)
         
-    # definindo as possicioes do vetor onde a amplitude = -1 
-    # e tranformando os valores dessas posicoes em strings binarias
+    # seleciona as possicioes do vetor 
+    # e tranforma os valores dessas posicoes em strings binarias
     # conseguindo os estados da base que precisarao ser modificados 
     
     positions = list(range(len(inputVector)))
@@ -118,6 +135,7 @@ def phaseEncodingGenerator(inputVector, circuit, q_input, nSize, q_aux=None, pha
         makePhaseEncodingV1(inputVector[pi_angle_pos], nSize, circuit, q_input, q_aux, q_target, q_bits_controllers)
         #makePhaseEncodingV2(inputVector[pi_angle_pos], nSize, circuit, q_input, q_aux, q_target)
         #makePhaseEncodingV3(inputVector[pi_angle_pos], circuit, q_target, q_bits_controllers)
+        #makePhaseEncodingVBin(inputVector[pi_angle_pos], nSize, circuit, q_input, q_aux, q_target)
         pi_angle_pos+=1
         
         # desfazendo a aplicação da porta Pauli-X nos mesmos qubits

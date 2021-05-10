@@ -92,6 +92,7 @@ class Encoding:
         newx = np.copy(input_vector)
         betas = []
         Encoding._recursive_compute_beta(newx, betas)
+        print(betas)
         self._generate_circuit(betas, self.qcircuit, self.quantum_data)
 
     def dc_amplitude_encoding(self, input_vector):
