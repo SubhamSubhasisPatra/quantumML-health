@@ -3,6 +3,7 @@ import os
 import pandas as pd
 
 
+
 #=============================
 # results threshold
 #=============================
@@ -32,7 +33,7 @@ def searchThreshold(models, output_data, search_space=None):
     for model in models:
         model_search = {}
         if search_space == None:
-            search = [0.25, 0.3, 0.35, 0.4, 0.45, 0.50, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95]
+            search = [0.01, 0.02, 0.05, 0.1, 0.15, 0.25, 0.3, 0.35, 0.4, 0.45, 0.50, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95]
         else:
             search = [search_space[models.index(model)]]
         for threshold in search:
@@ -48,13 +49,15 @@ def searchThreshold(models, output_data, search_space=None):
                     model_search[threshold] = sum(right)/len(right)
         # get threshold with the max value
         model_best['model'].append(model)
-        if search_space == None:
-            model_best['threshold'].append(max(model_search, key=model_search.get))
-            model_best['accuracy'].append(max(model_search.values()))
-        else:
-            print(model_search)
-            model_best['threshold'].append(list(model_search.keys())[0])
-            model_best['accuracy'].append(list(model_search.values())[0] )         
+        #print(model_search)
+        if model_search:
+            if search_space == None:
+                model_best['threshold'].append(max(model_search, key=model_search.get))
+                model_best['accuracy'].append(max(model_search.values()))
+            else:
+                #print(model_search)
+                model_best['threshold'].append(list(model_search.keys())[0])
+                model_best['accuracy'].append(list(model_search.values())[0] )         
 
     return pd.DataFrame(model_best)
 
@@ -81,14 +84,26 @@ def runSearch(range_value, experiment_path, experiment, target_test):
     return s1
 
 
+
+# diabetes
 experiment_path = 'results/version4/'
 target_test = 'test_data'
-
 runSearch(192, experiment_path, 'experiments_unbiased', target_test)
 runSearch(192, experiment_path, 'experiments_biased', target_test)
 
+# xor
+experiment_path = 'results/version6/'
+target_test = 'test_xor'
+runSearch(33, experiment_path, 'experiments_unbiased', target_test)
+runSearch(33, experiment_path, 'experiments_biased', target_test)
+ 
 
-
+# xor_lite
+experiment_path = 'results/version7/'
+target_test = 'test_xor'
+runSearch(20, experiment_path, 'experiments_unbiased', target_test)
+runSearch(33, experiment_path, 'experiments_biased', target_test)
+ 
 #=============================
 # error by epoch
 #=============================
