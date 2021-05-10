@@ -33,7 +33,7 @@ def searchThreshold(models, output_data, search_space=None):
     for model in models:
         model_search = {}
         if search_space == None:
-            search = [0.01, 0.02, 0.05, 0.1, 0.15, 0.25, 0.3, 0.35, 0.4, 0.45, 0.50, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95]
+            search = [0.1, 0.15, 0.25, 0.3, 0.35, 0.4, 0.45, 0.50, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95]
         else:
             search = [search_space[models.index(model)]]
         for threshold in search:
@@ -43,7 +43,7 @@ def searchThreshold(models, output_data, search_space=None):
                 right = list(map(lambda x, y:  1 if x == y else 0, output_data['flag'], preds))
                 model_search[threshold] = sum(right)/len(right)
             else:
-                if sum(preds) >= int(len(preds)/20): # se pelo menos 5% dos casos foram previstos como 1, continue
+                if sum(preds) >= int(len(preds)/5): # se pelo menos 20% dos casos foram previstos como 1, continue
                     # get accuracy
                     right = list(map(lambda x, y:  1 if x == y else 0, output_data['flag'], preds))
                     model_search[threshold] = sum(right)/len(right)
@@ -101,8 +101,8 @@ runSearch(33, experiment_path, 'experiments_biased', target_test)
 # xor_lite
 experiment_path = 'results/version7/'
 target_test = 'test_xor'
-runSearch(20, experiment_path, 'experiments_unbiased', target_test)
-runSearch(33, experiment_path, 'experiments_biased', target_test)
+#runSearch(40, experiment_path, 'experiments_unbiased', target_test)
+runSearch(40, experiment_path, 'experiments_biased', target_test)
  
 #=============================
 # error by epoch
