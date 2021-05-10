@@ -74,16 +74,17 @@ def createNeuron (inputVector, weightVector, circuitGeneratorOfUOperator, ancill
 	if circuitGeneratorOfUOperator == "hsgs":
 			for i in range(n):
 				circuit.h(q_input[i])
-			inputVectorBinarized = deterministicBinarization(inputVector)
+			inputVectorBinarized = thresholdBinarization(inputVector)
 			hsgsGenerator(inputVectorBinarized, circuit, q_input, n)
-			weightVectorBinarized = deterministicBinarization(weightVector)
+			weightVectorBinarized = thresholdBinarization(weightVector)
 			hsgsGenerator(weightVectorBinarized, circuit, q_input, n)
                     
 	elif circuitGeneratorOfUOperator == "phase-encoding":
 			for i in range(n):
 				circuit.h(q_input[i])
-			weightVector_negative = [x*-1 for x in weightVector]; phaseEncodingGenerator(inputVector, circuit, q_input, n, q_aux=q_aux)
-			phaseEncodingGenerator(weightVector_negative, circuit, q_input, n, q_aux=q_aux)            
+			phaseEncodingGenerator(inputVector, circuit, q_input, n, q_aux=q_aux)
+			weightVectorNegative = [x*-1 for x in weightVector]; 
+			phaseEncodingGenerator(weightVectorNegative, circuit, q_input, n, q_aux=q_aux)            
                 
 	elif circuitGeneratorOfUOperator == "sf":
 		for i in range(n):
@@ -92,13 +93,15 @@ def createNeuron (inputVector, weightVector, circuitGeneratorOfUOperator, ancill
 		sfGenerator(weightVector, circuit, q_input, None, n, q_aux, ancilla)
 
 	elif circuitGeneratorOfUOperator == "encoding-weight":
-		inputVectorBinarized = thresholdBinarization(inputVector)
+		#inputVectorBinarized = thresholdBinarization(inputVector) # FOR REAL 0-1 INPUTS
+		inputVectorBinarized = deterministicBinarization(inputVector)
 		encodingGenerator2(weightVector, circuit, q_input)
 		hsgsGenerator(inputVectorBinarized, circuit, q_input, n)
             
 	elif circuitGeneratorOfUOperator == "encoding-input":
 		encodingGenerator2(inputVector, circuit, q_input)
-		hsgsGenerator(weightVector, circuit, q_input, n)
+		weightVectorBinarized = deterministicBinarization(weightVector)
+		hsgsGenerator(weightVectorBinarized, circuit, q_input, n)
 		
 	else:
 		print("WARNING: nenhum neuronio valido selecionado")

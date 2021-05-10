@@ -32,7 +32,6 @@ def findBin(num_dec, n): # Função que tranforma os numeros das posições em s
 
 def makePhaseEncodingV1(pi_angle, n, circuit, ctrls, q_aux, q_target, q_bits_controllers): 
 
-    #print(ctrls, '\n', q_aux, '\n', q_bits_controllers)
     circuit.ccx(ctrls[0], ctrls[1], q_aux[0])
     for m in range(2, len(ctrls)):
         circuit.ccx(ctrls[m], q_aux[m-2], q_aux[m-1])
@@ -69,9 +68,7 @@ def makePhaseEncodingV3(pi_angle, circuit, q_target, q_bits_controllers):
     
 
 def makePhaseEncodingVBin(pi_angle, n, circuit, ctrls, q_aux, q_target): 
-     
-    #print(ctrls, '\n', q_aux, '\n')
-    
+         
     circuit.cx(ctrls[0], q_aux[0])
     for m in range(2, len(ctrls)):
         circuit.cx(ctrls[m], q_aux[m-1])
@@ -113,7 +110,7 @@ def phaseEncodingGenerator(inputVector, circuit, q_input, nSize, q_aux=None, pha
     
     # normalizacao Pi para o input_vector
     inputVector = normalizePi(inputVector)
-        
+            
     # seleciona as possicioes do vetor 
     # e tranforma os valores dessas posicoes em strings binarias
     # conseguindo os estados da base que precisarao ser modificados 
