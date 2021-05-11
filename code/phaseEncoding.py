@@ -70,18 +70,32 @@ def makePhaseEncodingV3(pi_angle, circuit, q_target, q_bits_controllers):
 def makePhaseEncodingVBin(pi_angle, n, circuit, ctrls, q_aux, q_target): 
          
     circuit.cx(ctrls[0], q_aux[0])
-    for m in range(2, len(ctrls)):
-        circuit.cx(ctrls[m], q_aux[m-1])
+    #for m in range(2, len(ctrls)):
+    #    circuit.cx(ctrls[m], q_aux[m-1])
         
     circuit.rz(pi_angle, q_target[0])
 
-    for m in range(len(ctrls)-1, 1, -1):
-        circuit.cx(ctrls[m], q_aux[m-1])
+    #for m in range(len(ctrls)-1, 1, -1):
+    #    circuit.cx(ctrls[m], q_aux[m-1])
     circuit.cx(ctrls[0], q_aux[0])
 
     return circuit
     
 
+def makePhaseEncodingVBin2(pi_angle, n, circuit, ctrls, q_aux, q_target): 
+         
+    #circuit.cx(ctrls[0], q_aux[0])
+    #for m in range(len(ctrls)):
+    #    circuit.x(ctrls[m])
+        
+    circuit.rz(pi_angle, q_target[0])
+
+    #for m in range(len(ctrls)):
+    #    circuit.cx(ctrls[m], q_aux[m])
+    #circuit.cx(ctrls[0], q_aux[0])
+
+    return circuit
+    
     
 def normalizePi(input_vector):
     ''' Pi vector normalization for values between 0 and 1
@@ -123,23 +137,23 @@ def phaseEncodingGenerator(inputVector, circuit, q_input, nSize, q_aux=None, pha
     for q_basis_state in pos_binary:
         # pegando cada posicao da string do estado onde o bit e 0
         # aplicando uma porta Pauli-X para invertê-lo
-        for indice_position in range(nSize):
-            if q_basis_state[indice_position] == '0':
-                circuit.x(q_input[indice_position])
+        #for indice_position in range(nSize):
+        #    if q_basis_state[indice_position] == '0':
+        #        circuit.x(q_input[indice_position])
         
         # aplicando porta multi-controlada entres os qubits em q_input
         q_bits_controllers = [q_control for q_control in q_input[:nSize-1]]
         q_target = q_input[[nSize-1]]
         
         # make phase encoding
-        makePhaseEncodingV1(inputVector[pi_angle_pos], nSize, circuit, q_input, q_aux, q_target, q_bits_controllers)
+        #makePhaseEncodingV1(inputVector[pi_angle_pos], nSize, circuit, q_input, q_aux, q_target, q_bits_controllers)
         #makePhaseEncodingV2(inputVector[pi_angle_pos], nSize, circuit, q_input, q_aux, q_target)
         #makePhaseEncodingV3(inputVector[pi_angle_pos], circuit, q_target, q_bits_controllers)
-        #makePhaseEncodingVBin(inputVector[pi_angle_pos], nSize, circuit, q_input, q_aux, q_target)
+        makePhaseEncodingVBin2(inputVector[pi_angle_pos], nSize, circuit, q_input, q_aux, q_target)
         pi_angle_pos+=1
         
         # desfazendo a aplicação da porta Pauli-X nos mesmos qubits
-        for indice_position in range(nSize):
-            if q_basis_state[indice_position] == '0':
-                circuit.x(q_input[indice_position])
+        #for indice_position in range(nSize):
+        #    if q_basis_state[indice_position] == '0':
+        #        circuit.x(q_input[indice_position])
     return circuit
