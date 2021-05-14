@@ -60,16 +60,12 @@ def createNeuron (inputVector, weightVector, circuitGeneratorOfUOperator, ancill
 	#circuit.add_register(q_target)
 	circuit.add_register(q_output)
 	circuit.add_register(c_output)
-    
-	if n-1 == 0:
-		q_aux = QuantumRegister(1, 'q_aux')
+           
+	if ancilla == True:
+		q_aux = QuantumRegister(n-1, 'q_aux')
 		circuit.add_register(q_aux)
-	else:        
-		if ancilla == True:
-			q_aux = QuantumRegister(n-1, 'q_aux')
-			circuit.add_register(q_aux)
-		else:
-			q_aux = None
+	else:
+		q_aux = None
         
 	if circuitGeneratorOfUOperator == "hsgs":
 			for i in range(n):
@@ -79,12 +75,36 @@ def createNeuron (inputVector, weightVector, circuitGeneratorOfUOperator, ancill
 			weightVectorBinarized = thresholdBinarization(weightVector)
 			hsgsGenerator(weightVectorBinarized, circuit, q_input, n)
                     
-	elif circuitGeneratorOfUOperator == "phase-encoding":
+	elif circuitGeneratorOfUOperator == "phase-encoding-phase":
 			for i in range(n):
 				circuit.h(q_input[i])
-			phaseEncodingGenerator(inputVector, circuit, q_input, n, q_aux=q_aux)
-			weightVectorNegative = [x*-1 for x in weightVector]; 
-			phaseEncodingGenerator(weightVectorNegative, circuit, q_input, n, q_aux=q_aux)            
+			phaseEncodingGenerator(inputVector, circuit, q_input, n)
+			phaseEncodingGenerator(weightVector, circuit, q_input, n, weight=True)            
+                                
+	elif circuitGeneratorOfUOperator == "phase-encoding-angle":
+			for i in range(n):
+				circuit.h(q_input[i])                      
+			inputVector =[math.atan(inputVector[0]/inputVector[1]), 0] # angle transformation
+			n = int(math.log(len(inputVector), 2))
+			phaseEncodingGenerator(inputVector, circuit, q_input, n)
+			phaseEncodingGenerator(weightVector, circuit, q_input, n, weight=True)            
+                                
+	elif circuitGeneratorOfUOperator == "phase-encoding-radius":
+			for i in range(n):
+				circuit.h(q_input[i])                
+			inputVector = [math.sqrt(inputVector[0]**2 + inputVector[1]**2), 0] # radius transformation
+			n = int(math.log(len(inputVector), 2))
+			phaseEncodingGenerator(inputVector, circuit, q_input, n)
+			phaseEncodingGenerator(weightVector, circuit, q_input, n, weight=True)          
+                   
+                                
+	elif circuitGeneratorOfUOperator == "phase-encoding-angleradius":
+			for i in range(n):
+				circuit.h(q_input[i])
+			inputVector = [math.sqrt(inputVector[0]**2 + inputVector[1]**2), math.atan(inputVector[0]/inputVector[1])]
+			n = int(math.log(len(inputVector), 2))
+			phaseEncodingGenerator(inputVector, circuit, q_input, n)
+			phaseEncodingGenerator(weightVectorNegative, circuit, q_input, n, weight=True)          
                 
 	elif circuitGeneratorOfUOperator == "sf":
 		for i in range(n):
@@ -118,7 +138,7 @@ def createNeuron (inputVector, weightVector, circuitGeneratorOfUOperator, ancill
 	return circuit
 
 
-def executeNeuron(neuronQuantumCircuit, simulator, threshold=None, nshots=1024):
+def executeNeuron(neuronQuantumCircuit, simulator, threshold=None, nshots=8192):
 	#neuronQuantumCircuit is the return of the function createNeuron
 	#simulator function of a qiskit quantum simulator
 	#expectedOutput is a Python List with expected value
@@ -144,9 +164,9 @@ def executeNeuron(neuronQuantumCircuit, simulator, threshold=None, nshots=1024):
         return results1/nshots
     else:
         if results1 >= (nshots * threshold):
-            neuronOutput = 1 # FARIA MAIS SENTIDO ISSO SER TRUE
+            neuronOutput = 1
         else:
-            neuronOutput = 0 # FARIA MAIS SENTIDO ISSO SER FALSE
+            neuronOutput = 0 
         return neuronOutput
 
 
