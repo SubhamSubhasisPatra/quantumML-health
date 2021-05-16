@@ -193,7 +193,7 @@ def quantumNeuronPREDICT(Xs_test, ys_test, weightVectorsPhaseEncoding, weightVec
                 operator = 'phase-encoding'
 
                 if phaseEstrategyOperator == 'angle':
-                    inputVector = [math.atan(inputVector[0]/inputVector[1]), math.atan(inputVector[0]/inputVector[1])]
+                    inputVector = [math.atan(inputVector[0]/inputVector[1]), 0]
                 elif phaseEstrategyOperator == 'radius':
                     inputVector = [math.sqrt(inputVector[0]**2 + inputVector[1]**2), 0]
                 elif phaseEstrategyOperator == 'angleradius':
