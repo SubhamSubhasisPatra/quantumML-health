@@ -92,14 +92,14 @@ def quantumNeuronFIT(Xs_train, ys_train, init_weight, lrParameter=0.09, threshol
             if ("phase-encoding" in trainingApproaches):
                 operator = "phase-encoding"
                 
+
                 if phaseEstrategyOperator == 'angle':
-                    inputVector = [math.atan(inputVector[0]/inputVector[1]), 0]
+                    inputVector = [math.atan(inputVector[i]/inputVector[i+1]) for i in range(0, len(inputVector), 2)] + [0]*int(len(inputVector)/2)
                 elif phaseEstrategyOperator == 'radius':
-                    inputVector = [math.sqrt(inputVector[0]**2 + inputVector[1]**2), 0]
+                    inputVector = [math.sqrt(inputVector[i]**2 + inputVector[i+1]**2) for i in range(0, len(inputVector), 2)] + [0]*int(len(inputVector)/2)
                 elif phaseEstrategyOperator == 'angleradius':
-                    inputVector = [math.sqrt(inputVector[0]**2 + inputVector[1]**2), math.atan(inputVector[0]/inputVector[1])]
-                    #inputVector = [math.sqrt(inputVector[i]**2) for i in range(len(inputVector))] + [math.atan(inputVector[i]**2) for i in range(len(inputVector))] 
-                                
+                    inputVector = [math.sqrt(inputVector[i]**2 + inputVector[i+1]**2) for i in range(0, len(inputVector), 2)] + [math.atan(inputVector[i]/inputVector[i+1]) for i in range(0, len(inputVector), 2)] 
+    
                 neuronPhase = createNeuron(inputVector, weightVectorPhaseEncoding, operator)
                 resultadoPhaseEncoding = executeNeuron(neuronPhase, simulator, threshold=None)
                 deltaRule(inputVector, weightVectorPhaseEncoding, lr=lrParameter, threshold=threshold, y_train=y_train, out=resultadoPhaseEncoding)
@@ -191,13 +191,13 @@ def quantumNeuronPREDICT(Xs_test, ys_test, weightVectorsPhaseEncoding, weightVec
 
             if ("phase-encoding" in testingApproaches):
                 operator = 'phase-encoding'
-
+                
                 if phaseEstrategyOperator == 'angle':
-                    inputVector = [math.atan(inputVector[0]/inputVector[1]), 0]
+                    inputVector = [math.atan(inputVector[i]/inputVector[i+1]) for i in range(0, len(inputVector), 2)] + [0]*int(len(inputVector)/2)
                 elif phaseEstrategyOperator == 'radius':
-                    inputVector = [math.sqrt(inputVector[0]**2 + inputVector[1]**2), 0]
+                    inputVector = [math.sqrt(inputVector[i]**2 + inputVector[i+1]**2) for i in range(0, len(inputVector), 2)] + [0]*int(len(inputVector)/2)
                 elif phaseEstrategyOperator == 'angleradius':
-                    inputVector = [math.sqrt(inputVector[0]**2 + inputVector[1]**2), math.atan(inputVector[0]/inputVector[1])]
+                    inputVector = [math.sqrt(inputVector[i]**2 + inputVector[i+1]**2) for i in range(0, len(inputVector), 2)] + [math.atan(inputVector[i]/inputVector[i+1]) for i in range(0, len(inputVector), 2)]                 
 
                 neuron = createNeuron(inputVector, weightVectorsPhaseEncoding, operator)
                 resultadoPhaseEncoding1 = executeNeuron(neuron, simulator, threshold=threshold)
@@ -230,15 +230,15 @@ def quantumNeuronPREDICT(Xs_test, ys_test, weightVectorsPhaseEncoding, weightVec
         #acerto_HSGS_ = [1 if outputsHSGS[i] == y_targets[i] else 0 for i in range(len(y_targets))]
         #acerto_phase_ = [1 if outputsPhaseEncoding[i] == y_targets[i] else 0 for i in range(len(y_targets))]
         
-        print("erro HSGS", erroHSGS/len(Xs_test))
-        print("erro phase encoding", erroPhaseEncoding/len(Xs_test))
+        #print("erro HSGS", erroHSGS/len(Xs_test))
+        #print("erro phase encoding", erroPhaseEncoding/len(Xs_test))
 
 
         errosHSGS.append(round(erroHSGS/len(Xs_test), 4))
         errosPhaseEncoding.append(round(erroPhaseEncoding/len(Xs_test), 4))
 
-    print("ERROS HSGS            ",  np.average(errosHSGS))
-    print("ERROS PHASE ENCODING  ",  np.average(errosPhaseEncoding))
+    print("AVG TEST ERROR HSGS   ",  np.average(errosHSGS))
+    print("AVG TEST ERROR PHASE  ",  np.average(errosPhaseEncoding))
 
     """
     #results and metrics
