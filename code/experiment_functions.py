@@ -1,155 +1,71 @@
 from code.neuron import *
 from code.encodingsource import *
 from code.hsgs import *
-from code.classical_neuron import *
 from code.classical_pso import *
 from code.sf import *
 simulator = Aer.get_backend('qasm_simulator')
 import pandas as pd
 import numpy as np
 
-
+            
 '''
 AUXILIARY FUNCTIONS
 '''
 
+def deltaRule(inputVector, weightVector, threshold=0.09, lr=0.01, y_train=0, out=0):
+    y_pred = 0
+    if abs(out) > threshold:
+        y_pred = 1
+    #print("atualizando pesos")
+    delta = y_train - y_pred
+    #delta = y_train-out
+    input_dim = len(weightVector)
+    for j in range(input_dim):
+        weightVector[j] =  weightVector[j] - (lr * delta * inputVector[j])
+        
+        
 def inverterSinalPeso(w):
     for i in range(len(w)):
         w[i] *= -1
         
-def treinamentoNeuronio(operator, inputVector, weightVector, y_train, lrParameter = 0.05, threshold=0.09):
-
-
-    n = int(math.log(len(inputVector), 2))
-
-    if (operator == "hsgs"):
-        wBinaryBinary = deterministicBinarization(weightVector) # Binarization of Real weights
-        neuron = createNeuron(inputVector, wBinaryBinary, operator)
-        resultado = executeNeuron(neuron, simulator, threshold=None)
-        deltaRule(inputVector, weightVector, lr=lrParameter, y_train=y_train, out=resultado)
-        return resultado
-    elif (operator == "encoding-weight"):        
-        inputBinary = thresholdBinarization(inputVector) # Binarization of Real inputs
-        neuron = createNeuron(inputBinary, weightVector, operator)
-        resultado = executeNeuron(neuron, simulator, threshold=None)
-        deltaRule(inputVector, weightVector, lr=lrParameter, y_train=y_train, out=resultado)
-        return resultado
-    elif (operator == "encoding-input"):        
-        neuron = createNeuron(inputVector, weightVector, operator)
-        resultado = executeNeuron(neuron, simulator, threshold=None)
-        deltaRule(inputVector, weightVector, lr=lrParameter, y_train=y_train, out=resultado)
-        return resultado
-    elif (operator == "phase-encoding-phase"): 
-        neuron = createNeuron(inputVector, weightVector, operator)
-        resultado = executeNeuron(neuron, simulator, threshold=None)
-        deltaRule(inputVector, weightVector, lr=lrParameter, threshold=threshold, y_train=y_train, out=resultado)
-        return resultado
-    elif (operator == "phase-encoding-angle"): 
-        neuron = createNeuron(inputVector, weightVector, operator)
-        resultado = executeNeuron(neuron, simulator, threshold=None)
-        deltaRule(inputVector, weightVector, lr=lrParameter, threshold=threshold, y_train=y_train, out=resultado)
-        return resultado
-    elif (operator == "phase-encoding-radius"): 
-        neuron = createNeuron(inputVector, weightVector, operator)
-        resultado = executeNeuron(neuron, simulator, threshold=None)
-        deltaRule(inputVector, weightVector, lr=lrParameter, threshold=threshold, y_train=y_train, out=resultado)
-        return resultado
-    elif (operator == "phase-encoding-angleradius"): 
-        neuron = createNeuron(inputVector, weightVector, operator)
-        resultado = executeNeuron(neuron, simulator, threshold=None)
-        deltaRule(inputVector, weightVector, lr=lrParameter, threshold=threshold, y_train=y_train, out=resultado)
-        return resultado
-    elif (operator == "neuronio-classico"):
-        resultado = runClassicalNeuronReturnProbability(inputVector, weightVector)
-        deltaRule(inputVector, weightVector, lr=lrParameter, y_train=y_train, out=resultado)
-        return resultado
-    elif (operator == "neuronio-classico-bin"):
-        wBinaryBinary = deterministicBinarization(weightVector)
-        resultado = runClassicalNeuronReturnProbability(inputVector, wBinaryBinary)
-        deltaRule(inputVector, weightVector, lr=lrParameter, y_train=y_train, out=resultado)
-        return resultado
-
+            
 '''
 EXPERIMENT FUNCTIONS
 '''
 
-
-
-def quantumNeuronFIT(Xs_train, ys_train, lrParameter=0.09, threshold=0.5, n_epochs=400, seed=1, trainingBias=True, trainingApproaches={}, epoch_results = False, phaseEstrategyOperator = 'phase-encoding-phase'):
+def quantumNeuronFIT(Xs_train, ys_train, init_weight, lrParameter=0.09, threshold=0.5, n_epochs=400, trainingBias=True, trainingApproaches={}, epoch_results = False, phaseEstrategyOperator = 'phase-encoding-phase'):
     
     print('lrParameter: ', lrParameter)
     print('threshold: ', threshold)
-    print('trainingBias: ', trainingBias
-    print('phaseEstrategyOperator: ' phaseEstrategyOperator)
-
-    np.random.seed(seed)
-    weightVectorsHSGS = []
-    weightVectorsEncodingWeight = []
-    weightVectorsEncodingInput = []
-    weightVectorsPhaseEncoding = []
+    print('trainingBias: ', trainingBias)
+    print('phaseEstrategyOperator: ', phaseEstrategyOperator)
 
     input_dim = len(Xs_train[0])
 
     if (trainingBias):
-        for i in range(len(list(set(ys_train)))):
-            vRandom = deterministicBinarization(np.random.uniform(-1, 1, 2*input_dim))
-            weightVectorsHSGS.append(vRandom.copy())
-            weightVectorsEncodingWeight.append(vRandom.copy())
-            weightVectorsEncodingInput.append(vRandom.copy())
-            weightVectorsPhaseEncoding.append(vRandom.copy())
+        weightVectorHSGS = init_weight.copy() + [1]*len(init_weight)
+        weightVectorPhaseEncoding = init_weight.copy() + [1]*len(init_weight)
     else:
-        for i in range(len(list(set(ys_train)))):
-            vRandom = deterministicBinarization(np.random.uniform(-1, 1, input_dim))
-            weightVectorsHSGS.append(vRandom.copy())
-            weightVectorsEncodingWeight.append(vRandom.copy()) 
-            weightVectorsEncodingInput.append(vRandom.copy())
-            weightVectorsPhaseEncoding.append(vRandom.copy())
+        weightVectorHSGS = init_weight.copy()
+        weightVectorPhaseEncoding = init_weight.copy()
 
-   
+    #bestWeightHSGS = []
+    #bestWeightPhaseEncoding = []
 
-    bestWeightsHSGS = []
-    bestWeightsEncodingWeight = []
-    bestWeightsEncodingInput = []
-    bestWeightsPhaseEncoding = []
-
-    bestErrorHSGS=999999
-    bestErrorEncodingWeight = 999999
-    bestErrorEncodingInput = 999999
+    bestErrorHSGS = 999999
     bestErrorPhaseEncoding = 999999
-
-    #bestWeightsHSGSInTime = []
-    #bestWeightsEncodingWeightInTime = []
-    #bestWeightsEncodingInputInTime = []
-    #bestWeightsPhaseEncodingInTime = []
-
-    limiarErroToleravel = 0.03
-
-    resultadoHSGS=0
-    resultadoEncodingWeight=0
-    resultadoEncodingInput=0
-    resultadoPhaseEncoding=0
-    resultadoClassico=0
-    resultadoClassicoBin=0
-    
-    #epoch_errosHSGS=[]
-    #epoch_errosEncodingWeight = []
-    #epoch_errosEncodingInput = []
-    #epoch_errosPhaseEncoding = []
-  
+    best_epoch_errosHSGS=[]
+    best_epoch_errosPhaseEncoding = []
 
     for iteration in range(n_epochs):
 
-        erroHSGS = 0
-        erroEncodingWeight = 0
-        erroEncodingInput = 0
-        erroPhaseEncoding = 0
+        epoch_erroHSGS = 0
+        epoch_erroPhaseEncoding = 0
 
         errosHSGS=[]
-        errosEncodingWeight = []
-        errosEncodingInput = []
         errosPhaseEncoding = []
 
-        for posicaoTreinamento in range(len(Xs_train)):
+        for posicaoTreinamento in range(len(Xs_train)):  
             
             inputVector = Xs_train[posicaoTreinamento]
             y_train = ys_train[posicaoTreinamento]
@@ -163,125 +79,95 @@ def quantumNeuronFIT(Xs_train, ys_train, lrParameter=0.09, threshold=0.5, n_epoc
             """
             if ("hsgs" in trainingApproaches):
                 operator = "hsgs"
-                resultadoHSGS = treinamentoNeuronio(operator = operator, 
-                                                    inputVector= inputVector, 
-                                                    weightVector = weightVectorsHSGS[y_train], 
-                                                    y_train=y_train, 
-                                                    lrParameter=lrParameter)
-
-                norm = np.linalg.norm(weightVectorsHSGS[y_train])
-                for i in range(len(weightVectorsHSGS[y_train])):
-                    weightVectorsHSGS[y_train][i] = round(weightVectorsHSGS[y_train][i]/norm,12)
+                
+                weightVectorHSGS_bin = deterministicBinarization(weightVectorHSGS) # Binarization of Real weights
+                neuronHSGS = createNeuron(inputVector, weightVectorHSGS_bin, operator)
+                resultadoHSGS = executeNeuron(neuronHSGS, simulator, threshold=None)
+                deltaRule(inputVector, weightVectorHSGS, lr=lrParameter, threshold=threshold, y_train=y_train, out=resultadoHSGS)
 
             
             """
             executando o phase encoding 
             """
             if ("phase-encoding" in trainingApproaches):
-                operator = phaseEstrategyOperator
-                resultadoPhaseEncoding = treinamentoNeuronio(operator = operator, 
-                                                    inputVector= inputVector, 
-                                                    weightVector = weightVectorsPhaseEncoding[y_train], 
-                                                    y_train=y_train, 
-                                                    lrParameter=lrParameter,
-                                                    threshold=threshold)
-
-                norm = np.linalg.norm(weightVectorsPhaseEncoding[y_train])
-                for i in range(len(weightVectorsPhaseEncoding[y_train])):
-                    weightVectorsPhaseEncoding[y_train][i] = round(weightVectorsPhaseEncoding[y_train][i]/norm,12)
-
-            
-            """
-            executando o encoding weight
-            """
-            if ("encoding-weight" in trainingApproaches):
-                operator = "encoding-weight"
-                resultadoEncodingWeight = treinamentoNeuronio(operator = operator, 
-                                                        inputVector= inputVector, 
-                                                        weightVector = weightVectorsEncodingWeight[y_train], 
-                                                        y_train=y_train, 
-                                                        lrParameter=lrParameter)
-
-                norm = np.linalg.norm(weightVectorsEncodingWeight[y_train])
-                for i in range(len(weightVectorsEncodingWeight[y_train])):
-                    weightVectorsEncodingWeight[y_train][i] = round(weightVectorsEncodingWeight[y_train][i]/norm,12)
+                operator = "phase-encoding"
                 
-            """
-            executando o encoding input
-            """
-            if ("encoding-input" in trainingApproaches):
-                operator = "encoding-input"
-                resultadoEncodingInput = treinamentoNeuronio(operator = operator, 
-                                                        inputVector= inputVector, 
-                                                        weightVector = weightVectorsEncodingInput[y_train], 
-                                                        y_train=y_train, 
-                                                        lrParameter=lrParameter)
+                if phaseEstrategyOperator == 'angle':
+                    inputVector = [math.atan(inputVector[0]/inputVector[1]), 0]
+                elif phaseEstrategyOperator == 'radius':
+                    inputVector = [math.sqrt(inputVector[0]**2 + inputVector[1]**2), 0]
+                elif phaseEstrategyOperator == 'angleradius':
+                    inputVector = [math.sqrt(inputVector[0]**2 + inputVector[1]**2), math.atan(inputVector[0]/inputVector[1])]
+                    #inputVector = [math.sqrt(inputVector[i]**2) for i in range(len(inputVector))] + [math.atan(inputVector[i]**2) for i in range(len(inputVector))] 
+                                
+                neuronPhase = createNeuron(inputVector, weightVectorPhaseEncoding, operator)
+                resultadoPhaseEncoding = executeNeuron(neuronPhase, simulator, threshold=None)
+                deltaRule(inputVector, weightVectorPhaseEncoding, lr=lrParameter, threshold=threshold, y_train=y_train, out=resultadoPhaseEncoding)
 
-                norm = np.linalg.norm(weightVectorsEncodingInput[y_train])
-                for i in range(len(weightVectorsEncodingInput[y_train])):
-                    weightVectorsEncodingInput[y_train][i] = round(weightVectorsEncodingInput[y_train][i]/norm,12)
-                
             """
-            erros
+            computar erros 
             """
-                        
-            errosHSGS.append(1-resultadoHSGS)
-            errosPhaseEncoding.append(1-resultadoPhaseEncoding)
-
-            erroHSGS += abs(1-resultadoHSGS)
-            erroPhaseEncoding += abs(1-resultadoPhaseEncoding)
+            
+            if (resultadoHSGS > threshold):
+                epoch_erroHSGS += abs(y_train - 1)
+                errosHSGS.append((1, abs(y_train)))
+            else:
+                epoch_erroHSGS += abs(y_train - 0)
+                errosHSGS.append((0, y_train))
             
             
-        if (erroHSGS < bestErrorHSGS):
-            bestWeightsHSGS = weightVectorsHSGS[:]
-            bestErrorHSGS = erroHSGS
+            if (resultadoPhaseEncoding > threshold):
+                epoch_erroPhaseEncoding += abs(y_train - 1)
+                errosPhaseEncoding.append((1, abs(y_train)))
+            else:
+                epoch_erroPhaseEncoding += abs(y_train - 0)
+                errosPhaseEncoding.append((0, y_train))
+            
+            
+        if (epoch_erroHSGS < bestErrorHSGS):
+            bestErrorHSGS = epoch_erroHSGS
+            best_epoch_errosHSGS = errosHSGS
         
-        if (erroPhaseEncoding < bestErrorPhaseEncoding):
-            bestWeightsPhaseEncoding = weightVectorsPhaseEncoding[:]
-            bestErrorPhaseEncoding = erroPhaseEncoding
-        
+        if (epoch_erroPhaseEncoding < bestErrorPhaseEncoding):
+            bestErrorPhaseEncoding = epoch_erroPhaseEncoding
+            best_epoch_errosPhaseEncoding = errosPhaseEncoding
 
         if epoch_results == True:    
-            print("\nerro HSGS", bestErrorHSGS)
-            #print("erro encoding weight", bestErrorEncodingWeight)
-            #print("erro encoding input", bestErrorEncodingInput)
-            print("erro phase encoding", bestErrorPhaseEncoding)
+            print("\nerro HSGS", epoch_erroHSGS)
+            print("weights HSGS", weightVectorHSGS)
+            print("erro phase encoding", epoch_erroPhaseEncoding)
+            print("weights phase encoding", weightVectorPhaseEncoding)
+            
+            
+        if epoch_erroPhaseEncoding == 0 and epoch_erroHSGS == 0:
+            print("\nbest error phase-encoding training: ", bestErrorPhaseEncoding)
+            print("best error HSGS training: ", bestErrorHSGS)
+            return [weightVectorPhaseEncoding, weightVectorHSGS, best_epoch_errosHSGS, best_epoch_errosPhaseEncoding]
     
-    #print("weight HSGS", bestErrorEncodingWeight)
-    #print("erro encoding input", bestErrorEncodingInput)
-    print("best error phase-encoding training", bestErrorPhaseEncoding)
-    print("\nbest error HSGS training", bestErrorHSGS)
-
-    return [bestWeightsPhaseEncoding, bestWeightsHSGS]
+    print("\nbest error phase-encoding training: ", bestErrorPhaseEncoding)
+    print("best error HSGS training: ", bestErrorHSGS)
+    return [weightVectorPhaseEncoding, weightVectorHSGS, best_epoch_errosHSGS, best_epoch_errosPhaseEncoding]
 
 
-def quantumNeuronPREDICT(Xs_test, ys_test, weightVectorsPhaseEncoding, weightVectorsHSGS,  thresholdParameter=0.5, repeat=30, bias=True, testingApproaches={}, phaseEstrategyOperator = 'phase-encoding-phase'):
+def quantumNeuronPREDICT(Xs_test, ys_test, weightVectorsPhaseEncoding, weightVectorsHSGS,  threshold=0.5, repeat=30, bias=True, testingApproaches={}, phaseEstrategyOperator = 'phase-encoding-phase'):
     
     
     errosHSGS = []
-    errosEncodingWeight = []
-    errosEncodingInput = []
     errosPhaseEncoding = []
-    errosClassico = []
-    errosClassicoBin = []
 
     outputsHSGS = []
-    outputsEncodingWeight = []
-    outputsEncodingInput = []
     outputsPhaseEncoding = []
-
+    
+    y_targets =[]
+    y_examples =[]
 
 
     for i in range(repeat):
         erroHSGS = 0
-        erroEncodingWeight = 0
-        erroEncodingInput = 0
         erroPhaseEncoding = 0
-        erroClassico =0
-        erroClassicoBin=0
 
         for pos in range(len(Xs_test)):
-            inputVector = Xs_test[pos] # inputVectors[pos]
+            inputVector = Xs_test[pos] 
 
             if bias == True:
                 inputVector = inputVector + len(inputVector)*[1]
@@ -291,92 +177,67 @@ def quantumNeuronPREDICT(Xs_test, ys_test, weightVectorsPhaseEncoding, weightVec
             valorMaiorHSGS=0
             neuronMaiorHSGS=0
 
-            valorMaiorEncodingWeight=0
-            neuronMaiorEncodingWeight=0
-
-            valorMaiorEncodingInput=0
-            neuronMaiorEncodingInput=0
-
             valorMaiorPhaseEncoding=0
             neuronMaiorPhaseEncoding=0
 
 
-            for neuronClass in range(len(list(set(ys_test)))):
+            #for neuronClass in range(len(list(set(ys_test)))):
+            if ("hsgs" in testingApproaches):
+                operator = "hsgs"
+                wBinaryBinary = deterministicBinarization(weightVectorsHSGS) # Binarization of Real weights
+                neuron = createNeuron(inputVector, wBinaryBinary, operator)
+                resultadoHSGS1 = executeNeuron(neuron, simulator, threshold=threshold)
 
-                if ("hsgs" in testingApproaches):
-                    operator = "hsgs"
-                    wBinaryBinary = deterministicBinarization(weightVectorsHSGS[neuronClass]) # Binarization of Real weights
-                    neuron = createNeuron(inputVector, wBinaryBinary, operator)
-                    resultadoHSGS1 = executeNeuron(neuron, simulator, threshold=None)
-                    if(resultadoHSGS1 > valorMaiorHSGS):
-                        neuronMaiorHSGS = neuronClass
-                        valorMaiorHSGS = resultadoHSGS1
 
-                if ("phase-encoding" in testingApproaches):
-                    operator = phaseEstrategyOperator
-                    neuron = createNeuron(inputVector, weightVectorsPhaseEncoding[neuronClass], operator)
-                    resultadoPhaseEncoding1 = executeNeuron(neuron, simulator, threshold=None)
-                    if(resultadoPhaseEncoding1 > valorMaiorPhaseEncoding):
-                        neuronMaiorPhaseEncoding = neuronClass
-                        valorMaiorPhaseEncoding = resultadoPhaseEncoding1
-                        
-                if ("encoding-weight" in testingApproaches):
-                    operator = "encoding-weight"
-                    inputBinary = thresholdBinarization(inputVector) # Binarization of Real Inputs
-                    neuron = createNeuron(inputBinary,  weightVectorsEncodingWeight[neuronClass], operator)
-                    resultadoEncodingWeight1 = executeNeuron(neuron, simulator, threshold=None)
-                    if(resultadoEncodingWeight1 > valorMaiorEncodingWeight):
-                        neuronMaiorEncodingWeight = neuronClass
-                        valorMaiorEncodingWeight = resultadoEncodingWeight1
-                        
-                if ("encoding-input" in testingApproaches):
-                    operator = "encoding-input"
-                    neuron = createNeuron(inputVector, weightVectorsEncodingInput[neuronClass], operator)
-                    resultadoEncodingInput1 = executeNeuron(neuron, simulator, threshold=None)
-                    if(resultadoEncodingInput1 > valorMaiorEncodingInput):
-                        neuronMaiorEncodingInput = neuronClass
-                        valorMaiorEncodingInput = resultadoEncodingInput1
+            if ("phase-encoding" in testingApproaches):
+                operator = 'phase-encoding'
 
-                # get predicted probability results to class 1
-                #if neuronClass == 1:
-                #    outputsHSGS.append(resultadoHSGS1)
-                #    outputsEncodingWeight.append(resultadoEncodingWeight1)
-                #    outputsEncodingInput.append(resultadoEncodingInput1)
-                #    outputsPhaseEncoding.append(resultadoPhaseEncoding1)
+                if phaseEstrategyOperator == 'angle':
+                    inputVector = [math.atan(inputVector[0]/inputVector[1]), math.atan(inputVector[0]/inputVector[1])]
+                elif phaseEstrategyOperator == 'radius':
+                    inputVector = [math.sqrt(inputVector[0]**2 + inputVector[1]**2), 0]
+                elif phaseEstrategyOperator == 'angleradius':
+                    inputVector = [math.sqrt(inputVector[0]**2 + inputVector[1]**2), math.atan(inputVector[0]/inputVector[1])]
 
-            ##################################################
+                neuron = createNeuron(inputVector, weightVectorsPhaseEncoding, operator)
+                resultadoPhaseEncoding1 = executeNeuron(neuron, simulator, threshold=threshold)
+
+
+
             """
             erros
             """
 
-             # get predicted probability results to class 1
-            outputsHSGS.append(neuronMaiorHSGS)
-            outputsPhaseEncoding.append(neuronMaiorPhaseEncoding)
+            # get predicted probability results to class 1
+            outputsHSGS.append(resultadoHSGS1)
+            outputsPhaseEncoding.append(resultadoPhaseEncoding1)
+            y_targets.append(target)
+            y_examples.append(Xs_test[pos])
 
+            
             erroHSGS_bin = 0
-            if (neuronMaiorHSGS != target):   
+            if (resultadoHSGS1 != target):   
                 erroHSGS_bin = 1
 
             erroPhaseEncoding_bin = 0
-            if (neuronMaiorPhaseEncoding != target):   
+            if (resultadoPhaseEncoding1 != target):   
                 erroPhaseEncoding_bin = 1
 
             erroHSGS += erroHSGS_bin####abs(resultadoHSGS_bin-y_train)
             erroPhaseEncoding += erroPhaseEncoding_bin####abs(resultadoEncoding_bin-y_train)
- 
-
-        #print("erro HSGS", erroHSGS/len(Xs_test))
-        #print("erro phase encoding", erroPhaseEncoding/len(Xs_test))
+            
+            
+        #acerto_HSGS_ = [1 if outputsHSGS[i] == y_targets[i] else 0 for i in range(len(y_targets))]
+        #acerto_phase_ = [1 if outputsPhaseEncoding[i] == y_targets[i] else 0 for i in range(len(y_targets))]
+        
+        print("erro HSGS", erroHSGS/len(Xs_test))
+        print("erro phase encoding", erroPhaseEncoding/len(Xs_test))
 
 
         errosHSGS.append(round(erroHSGS/len(Xs_test), 4))
-        #errosEncodingWeight.append(round(erroEncodingWeight/len(Xs_test), 4))
-        #errosEncodingInput.append(round(erroEncodingInput/len(Xs_test), 4))
         errosPhaseEncoding.append(round(erroPhaseEncoding/len(Xs_test), 4))
 
     print("ERROS HSGS            ",  np.average(errosHSGS))
-    #print("ERROS ENCODING WEIGHT ",  np.average(errosEncodingWeight))
-    #print("ERROS ENCODING INPUT  ",  np.average(errosEncodingInput))
     print("ERROS PHASE ENCODING  ",  np.average(errosPhaseEncoding))
 
     """
@@ -393,4 +254,4 @@ def quantumNeuronPREDICT(Xs_test, ys_test, weightVectorsPhaseEncoding, weightVec
         }
     
     """
-    return  np.average(errosPhaseEncoding), outputsPhaseEncoding, weightVectorsPhaseEncoding, np.average(errosHSGS), outputsHSGS,  weightVectorsHSGS
+    return  np.average(errosPhaseEncoding), outputsPhaseEncoding, weightVectorsPhaseEncoding, np.average(errosHSGS), outputsHSGS,  weightVectorsHSGS, y_targets, y_examples

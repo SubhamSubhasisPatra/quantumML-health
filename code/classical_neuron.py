@@ -95,5 +95,6 @@ def deltaRule (inputVector, weightVector, threshold=0.09, lr=0.01, y_train=0, ou
     delta = y_train - y_pred
     input_dim = len(weightVector)
     for j in range(input_dim):
-        weightVector[j] =  weightVector[j] - (lr * delta * inputVector[j])     
-     
+        weightVector[j] =  weightVector[j] - (lr * delta * inputVector[j])  
+        
+    return weightVector
