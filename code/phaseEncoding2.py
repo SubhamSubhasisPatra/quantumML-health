@@ -29,33 +29,47 @@ def findBin(num_dec, n): # Função que tranforma os numeros das posições em s
         num_bin.append(decToBin(num_dec[i], n))
     return num_bin
 
-def phaseEncodingGenerator(inputVector, circuit, q_input, nSize, q_aux=None, ancila=False, weight=False):# Função que aplica um Sign-Flip Block nos vetores de entradas e pesos
-	#inputVector is a Python list 
-		#eg. inputVector=[1, -1, 1, 1]
-	#nSize is the input size
+def makePhaseEncodingAncilla(pi_angle, n, circuit, ctrls, q_aux, q_target, q_bits_controllers): 
 
-	## this functions returns the quantum circuit that generates the quantum state whose amplitudes values are the values of inputVector using the SFGenerator approach.
+    circuit.ccx(ctrls[0], ctrls[1], q_aux[0])
+    for m in range(2, len(ctrls)):
+        circuit.ccx(ctrls[m], q_aux[m-2], q_aux[m-1])
+        
+    circuit.mcrz(pi_angle, q_bits_controllers, q_target[0])
     
+    for m in range(len(ctrls)-1, 1, -1):
+        circuit.ccx(ctrls[m], q_aux[m-2], q_aux[m-1])
+    circuit.ccx(ctrls[0], ctrls[1], q_aux[0])
+
+    return circuit
+
+
+def phaseEncodingGenerator(inputVector, circuit, q_input, nSize, q_aux=None, ancila=False, weight=False):
     
     """
-    if ancila == True:
-        q_aux = QuantumRegister(nSize-1, 'q_aux')
-        circuit.add_register(q_aux)
+    PhaseEncoding Sign-Flip Block Algorithm
+    
+    inputVector is a Python list 
+    nSize is the input size
+
+    this functions returns the quantum circuit that generates the quantum state 
+    whose amplitudes values are the values of inputVector using the SFGenerator approach.
     """
+    
     positions = []
         
-    # definindo as posições do vetor onde a amplitude é -1 
-    # e tranformando os valores dessas posições em strings binárias
-    # conseguindo os estados da base que precisarão ser modificados 
-    #positions = findDec(inputVector, nSize)
-    positions = [i for i in range(len(inputVector))]
+    # seleciona as posicoes do vetor 
+    # e tranforma os valores dessas posicoes em strings binarias
+    # conseguindo os estados da base que precisarao ser modificados 
+    
+    positions = list(range(len(inputVector)))
     pos_binary = findBin(positions, nSize)
 
-    posInput = 0
+    pi_angle_pos = 0
     # laço para percorrer cada estado base em pos_binay
     for q_basis_state in pos_binary:
-        # pegando cada posição da string do estado onde o bit é 0
-        # aplicando uma porta Pauli-X para invertê-lo
+        # pegando cada posição da string do estado onde o bit = 0
+        # aplicando uma porta Pauli-X para inverte-lo
         for indice_position in range(nSize):
             if q_basis_state[indice_position] == '0':
                 circuit.x(q_input[indice_position])
@@ -64,16 +78,15 @@ def phaseEncodingGenerator(inputVector, circuit, q_input, nSize, q_aux=None, anc
         q_bits_controllers = [q_control for q_control in q_input[:nSize-1]]
         q_target = q_input[[nSize-1]]
         if (nSize >2 ):
-            circuit.mcrz(inputVector[posInput], q_bits_controllers, q_target[0])
+            circuit.mcrz(inputVector[pi_angle_pos], q_bits_controllers, q_target[0])
         else:
-            circuit.rz(inputVector[posInput], q_target[0])
+            circuit.rz(inputVector[pi_angle_pos], q_target[0])
             
             
         # desfazendo a aplicação da porta Pauli-X nos mesmos qubits
         for indice_position in range(nSize):
             if q_basis_state[indice_position] == '0':
                 circuit.x(q_input[indice_position])
-        ###print(inputVector[posInput])
-        posInput+=1
+        pi_angle_pos+=1
         
     return circuit
