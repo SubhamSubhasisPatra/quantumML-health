@@ -29,8 +29,7 @@ def findBin(num_dec, n): # Função que tranforma os numeros das posições em s
         num_bin.append(decToBin(num_dec[i], n))
     return num_bin
 
-
-def makePhaseEncodingV1(pi_angle, n, circuit, ctrls, q_aux, q_target, q_bits_controllers): 
+def makePhaseEncodingAncilla(pi_angle, n, circuit, ctrls, q_aux, q_target, q_bits_controllers): 
 
     circuit.ccx(ctrls[0], ctrls[1], q_aux[0])
     for m in range(2, len(ctrls)):
@@ -45,59 +44,8 @@ def makePhaseEncodingV1(pi_angle, n, circuit, ctrls, q_aux, q_target, q_bits_con
     return circuit
 
 
-def makePhaseEncodingV2(pi_angle, n, circuit, ctrls, q_aux, q_target): 
+def phaseEncodingGenerator(inputVector, circuit, q_input, nSize, q_aux=None, ancila=False, weight=False):
     
-    circuit.ccx(ctrls[0], ctrls[1], q_aux[0])
-    for m in range(2, len(ctrls)):
-        circuit.ccx(ctrls[m], q_aux[m-2], q_aux[m-1])
-        
-    circuit.mcrz(pi_angle, [q_aux[n-2]], q_target[0])
-    
-    for m in range(len(ctrls)-1, 1, -1):
-        circuit.ccx(ctrls[m], q_aux[m-2], q_aux[m-1])
-    circuit.ccx(ctrls[0], ctrls[1], q_aux[0])
-
-    return circuit
-
-
-def makePhaseEncodingV3(pi_angle, circuit, q_target, q_bits_controllers): 
-     
-    circuit.mcrz(pi_angle, q_bits_controllers, q_target[0])
-    
-    return circuit
-    
-
-def makePhaseEncodingVBin(pi_angle, n, circuit, ctrls, q_aux, q_target): 
-         
-    circuit.cx(ctrls[0], q_aux[0])
-    #for m in range(2, len(ctrls)):
-    #    circuit.cx(ctrls[m], q_aux[m-1])
-        
-    circuit.rz(pi_angle, q_target[0])
-
-    #for m in range(len(ctrls)-1, 1, -1):
-    #    circuit.cx(ctrls[m], q_aux[m-1])
-    circuit.cx(ctrls[0], q_aux[0])
-
-    return circuit
-    
-
-    
-def normalizePi(input_vector):
-    ''' Pi vector normalization for values between 0 and 1
-    '''
-    
-    normalized_vector=[]
-
-    for value in input_vector:
-        new_value = ((value-0)/(1-0))*np.pi
-        normalized_vector.append(new_value)
-    
-    return normalized_vector
-
-
-            
-def phaseEncodingGenerator(inputVector, circuit, q_input, nSize, q_aux=None, phase=3):
     """
     PhaseEncoding Sign-Flip Block Algorithm
     
@@ -108,38 +56,37 @@ def phaseEncodingGenerator(inputVector, circuit, q_input, nSize, q_aux=None, pha
     whose amplitudes values are the values of inputVector using the SFGenerator approach.
     """
     
-    # normalizacao Pi para o input_vector
-    inputVector = normalizePi(inputVector)
-            
-    # seleciona as possicioes do vetor 
+    positions = []
+        
+    # seleciona as posicoes do vetor 
     # e tranforma os valores dessas posicoes em strings binarias
     # conseguindo os estados da base que precisarao ser modificados 
     
     positions = list(range(len(inputVector)))
     pos_binary = findBin(positions, nSize)
 
-    # laco para percorrer cada estado base em pos_binay
-    pi_angle_pos=0
+    pi_angle_pos = 0
+    # laço para percorrer cada estado base em pos_binay
     for q_basis_state in pos_binary:
-        # pegando cada posicao da string do estado onde o bit e 0
-        # aplicando uma porta Pauli-X para invertê-lo
+        # pegando cada posição da string do estado onde o bit = 0
+        # aplicando uma porta Pauli-X para inverte-lo
         for indice_position in range(nSize):
             if q_basis_state[indice_position] == '0':
                 circuit.x(q_input[indice_position])
         
-        # aplicando porta multi-controlada entres os qubits em q_input
+        # aplicando porta Pauli-Z multi-controlada entres os qubits em q_input
         q_bits_controllers = [q_control for q_control in q_input[:nSize-1]]
         q_target = q_input[[nSize-1]]
-        
-        # make phase encoding
-        #makePhaseEncodingV1(inputVector[pi_angle_pos], nSize, circuit, q_input, q_aux, q_target, q_bits_controllers)
-        #makePhaseEncodingV2(inputVector[pi_angle_pos], nSize, circuit, q_input, q_aux, q_target)
-        #makePhaseEncodingV3(inputVector[pi_angle_pos], circuit, q_target, q_bits_controllers)
-        makePhaseEncodingVBin(inputVector[pi_angle_pos], nSize, circuit, q_input, q_aux, q_target)
-        pi_angle_pos+=1
-        
+        if (nSize >2 ):
+            circuit.mcrz(inputVector[pi_angle_pos], q_bits_controllers, q_target[0])
+        else:
+            circuit.rz(inputVector[pi_angle_pos], q_target[0])
+            
+            
         # desfazendo a aplicação da porta Pauli-X nos mesmos qubits
         for indice_position in range(nSize):
             if q_basis_state[indice_position] == '0':
                 circuit.x(q_input[indice_position])
+        pi_angle_pos+=1
+        
     return circuit

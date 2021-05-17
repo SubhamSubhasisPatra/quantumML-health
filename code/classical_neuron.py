@@ -88,30 +88,13 @@ for threshold in [0.07, 0.08, 0.09, 0.01, 0.001, 0.01, 0.02]:
 # runNeuron (nb_epochs=100, binaryWeights=True, stochastic=True)
 
 
-
 def deltaRule (inputVector, weightVector, threshold=0.09, lr=0.01, y_train=0, out=0):
     y_pred = 0
     if abs(out) > threshold:
         y_pred = 1
-    #print("atualizando pesos")
-    #delta = y_train - y_pred
-    delta = y_train-out
+    delta = y_train - y_pred
     input_dim = len(weightVector)
     for j in range(input_dim):
-        weightVector[j] =  weightVector[j] - (lr * delta * inputVector[j])     
-    """
-    old
-    """
-    """
-    y_pred = 0
-    if abs(out) > threshold:
-        y_pred = 1
-    if y_pred != y_train:
-        #print("atualizando pesos")
-        #delta = y_train - y_pred
-        delta = y_train-out
-        input_dim = len(weightVector)
-
-        for j in range(input_dim):
-            weightVector[j] =  weightVector[j] + (lr * delta * inputVector[j])
-    """
+        weightVector[j] =  weightVector[j] - (lr * delta * inputVector[j])  
+        
+    return weightVector
