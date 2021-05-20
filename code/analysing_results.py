@@ -101,7 +101,7 @@ runSearch(33, experiment_path, 'experiments_biased', target_test)
 # xor_lite
 experiment_path = 'results/version7/'
 target_test = 'test_xor'
-#runSearch(40, experiment_path, 'experiments_unbiased', target_test)
+runSearch(40, experiment_path, 'experiments_unbiased', target_test)
 runSearch(40, experiment_path, 'experiments_biased', target_test)
  
 #=============================
