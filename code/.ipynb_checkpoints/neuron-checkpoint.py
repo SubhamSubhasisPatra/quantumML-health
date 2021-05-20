@@ -66,47 +66,32 @@ def createNeuron (inputVector, weightVector, circuitGeneratorOfUOperator, ancill
 		circuit.add_register(q_aux)
 	else:
 		q_aux = None
-        
-	if circuitGeneratorOfUOperator == "hsgs":
+
+                                        
+	if circuitGeneratorOfUOperator == "phase-encoding":
 			for i in range(n):
 				circuit.h(q_input[i])
-			inputVectorBinarized = thresholdBinarization(inputVector)
-			hsgsGenerator(inputVectorBinarized, circuit, q_input, n)
-			weightVectorBinarized = thresholdBinarization(weightVector)
-			hsgsGenerator(weightVectorBinarized, circuit, q_input, n)
-                    
-	elif circuitGeneratorOfUOperator == "phase-encoding-phase":
-			for i in range(n):
-				circuit.h(q_input[i])
+                
+			inputVector = [i*math.pi for i in inputVector]
+			weightVector = [-i*math.pi for i in weightVector]
+            
 			phaseEncodingGenerator(inputVector, circuit, q_input, n)
-			phaseEncodingGenerator(weightVector, circuit, q_input, n, weight=True)            
-                                
-	elif circuitGeneratorOfUOperator == "phase-encoding-angle":
-			for i in range(n):
-				circuit.h(q_input[i])                      
-			inputVector =[math.atan(inputVector[0]/inputVector[1]), 0] # angle transformation
-			n_input = int(math.log(len(inputVector), 2))
-			phaseEncodingGenerator(inputVector, circuit, q_input, n_input)
-			phaseEncodingGenerator(weightVector, circuit, q_input, n, weight=True)            
-                                
-	elif circuitGeneratorOfUOperator == "phase-encoding-radius":
-			for i in range(n):
-				circuit.h(q_input[i])                
-			inputVector = [math.sqrt(inputVector[0]**2 + inputVector[1]**2), 0] # radius transformation
-			n_input = int(math.log(len(inputVector), 2))
-			phaseEncodingGenerator(inputVector, circuit, q_input, n_input)
-			phaseEncodingGenerator(weightVector, circuit, q_input, n, weight=True)          
-                   
-                                
-	elif circuitGeneratorOfUOperator == "phase-encoding-angleradius":
-			for i in range(n):
-				circuit.h(q_input[i])
-			inputVector = [math.sqrt(inputVector[0]**2 + inputVector[1]**2), math.atan(inputVector[0]/inputVector[1])]
-			n_input = int(math.log(len(inputVector), 2))
-			print('neuron: ', inputVector)
-			phaseEncodingGenerator(inputVector, circuit, q_input, n_input)
 			phaseEncodingGenerator(weightVector, circuit, q_input, n, weight=True)          
                 
+                
+	elif circuitGeneratorOfUOperator == "hsgs":
+			for i in range(n):
+				circuit.h(q_input[i])
+                
+			inputVectorbin = deterministicBinarization(inputVector)
+			weightVectorbin = deterministicBinarization(weightVector)
+			inputVectorbin = [i*math.pi for i in inputVectorbin]
+			weightVectorbin = [-i*math.pi for i in weightVectorbin]
+            
+			hsgsGenerator(inputVectorbin, circuit, q_input, n)
+			hsgsGenerator(weightVectorbin, circuit, q_input, n)
+
+            
 	elif circuitGeneratorOfUOperator == "sf":
 		for i in range(n):
 			circuit.h(q_input[i])
@@ -141,6 +126,7 @@ def createNeuron (inputVector, weightVector, circuitGeneratorOfUOperator, ancill
 
 
 def executeNeuron(neuronQuantumCircuit, simulator, threshold=None, nshots=8192):
+    from qiskit.tools.visualization import plot_histogram
 	#neuronQuantumCircuit is the return of the function createNeuron
 	#simulator function of a qiskit quantum simulator
 	#expectedOutput is a Python List with expected value
@@ -153,8 +139,7 @@ def executeNeuron(neuronQuantumCircuit, simulator, threshold=None, nshots=8192):
     job = execute(circuit, backend=simulator, shots=nshots)
     result = job.result()
     count = result.get_counts()
-    
-    from qiskit.tools.visualization import plot_histogram, plot_state_city
+
     
     # print(count)
     results1 = count.get('1') # Resultados que deram 1
@@ -166,7 +151,7 @@ def executeNeuron(neuronQuantumCircuit, simulator, threshold=None, nshots=8192):
 
     # Utilizando threshold
     if (threshold == None):
-        return results1/nshots, plot_histogram(count, title='Experiment')
+        return results1/nshots #, plot_histogram(count, title='Experiment')
     else:
         if (results1/nshots) >= threshold:
             neuronOutput = 1
