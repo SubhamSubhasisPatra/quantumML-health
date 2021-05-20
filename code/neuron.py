@@ -126,6 +126,7 @@ def createNeuron (inputVector, weightVector, circuitGeneratorOfUOperator, ancill
 
 
 def executeNeuron(neuronQuantumCircuit, simulator, threshold=None, nshots=8192):
+    #from qiskit.tools.visualization import plot_histogram
 	#neuronQuantumCircuit is the return of the function createNeuron
 	#simulator function of a qiskit quantum simulator
 	#expectedOutput is a Python List with expected value
@@ -150,7 +151,7 @@ def executeNeuron(neuronQuantumCircuit, simulator, threshold=None, nshots=8192):
 
     # Utilizando threshold
     if (threshold == None):
-        return results1/nshots #, plot_histogram(count, title='Experiment'); from qiskit.tools.visualization import plot_histogram
+        return results1/nshots#, plot_histogram(count, title='Experiment')
     else:
         if (results1/nshots) >= threshold:
             neuronOutput = 1

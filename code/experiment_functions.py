@@ -56,6 +56,9 @@ def quantumNeuronFIT(Xs_train, ys_train, init_weight, lrParameter=0.09, threshol
     bestErrorPhaseEncoding = 999999
     best_epoch_errosHSGS=[]
     best_epoch_errosPhaseEncoding = []
+    
+    epoch_evolutionHSGS = []
+    epoch_evolutionPhaseEncoding = []
 
     for iteration in range(n_epochs):
 
@@ -123,7 +126,9 @@ def quantumNeuronFIT(Xs_train, ys_train, init_weight, lrParameter=0.09, threshol
                 epoch_erroPhaseEncoding += abs(y_train - 0)
                 errosPhaseEncoding.append((0, y_train))
             
-            
+        epoch_evolutionHSGS.append(epoch_erroHSGS)
+        epoch_evolutionPhaseEncoding.append(epoch_erroPhaseEncoding)
+        
         if (epoch_erroHSGS < bestErrorHSGS):
             bestErrorHSGS = epoch_erroHSGS
             best_epoch_errosHSGS = errosHSGS
@@ -142,11 +147,11 @@ def quantumNeuronFIT(Xs_train, ys_train, init_weight, lrParameter=0.09, threshol
         if epoch_erroPhaseEncoding == 0 and epoch_erroHSGS == 0:
             print("\nbest error phase-encoding training: ", bestErrorPhaseEncoding)
             print("best error HSGS training: ", bestErrorHSGS)
-            return [weightVectorPhaseEncoding, weightVectorHSGS, best_epoch_errosHSGS, best_epoch_errosPhaseEncoding]
+            return [weightVectorPhaseEncoding, weightVectorHSGS, best_epoch_errosHSGS, best_epoch_errosPhaseEncoding, epoch_evolutionHSGS, epoch_evolutionPhaseEncoding]
     
     print("\nbest error phase-encoding training: ", bestErrorPhaseEncoding)
     print("best error HSGS training: ", bestErrorHSGS)
-    return [weightVectorPhaseEncoding, weightVectorHSGS, best_epoch_errosHSGS, best_epoch_errosPhaseEncoding]
+    return [weightVectorPhaseEncoding, weightVectorHSGS, best_epoch_errosHSGS, best_epoch_errosPhaseEncoding, epoch_evolutionHSGS, epoch_evolutionPhaseEncoding]
 
 
 def quantumNeuronPREDICT(Xs_test, ys_test, weightVectorsPhaseEncoding, weightVectorsHSGS,  threshold=0.5, repeat=30, bias=True, testingApproaches={}, phaseEstrategyOperator = 'phase-encoding-phase'):
