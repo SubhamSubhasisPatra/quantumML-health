@@ -1,4 +1,8 @@
-,epoch,epoch_error_hsgs,epoch_error_phase_encoding_original,epoch_error_phase_encoding_angle,epoch_error_phase_encoding_radius,epoch_error_phase_encoding_angleradius
+,epoch,HSGS,"phase-encoding
+original","phase-encoding
+angle","phase-encoding
+radius","phase-encoding
+angleradius"
 0,0,2,2,0,2,0
 1,1,2,2,0,2,0
 2,2,2,2,0,2,0
