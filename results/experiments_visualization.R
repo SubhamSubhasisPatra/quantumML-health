@@ -85,3 +85,34 @@ ggplot(data, aes(x=phase_strategy, y=avg_error, fill=phase_strategy)) +
   theme(legend.position = "none") 
 
 ggsave('results/xor-real-models.png', height = 4, width = 7, units = 'in')  
+
+
+#==============
+# diabetes
+#=============
+
+d1 = read_csv('results/experiment_diabetes_original.csv')
+d2 = read_csv('results/experiment_diabetes_angle.csv')
+d3 = read_csv('results/experiment_diabetes_angleradius.csv')
+d4 = read_csv('results/experiment_diabetes_radius.csv')
+d44 = read_csv('results/experiment_diabetes_radius2.csv')
+
+diabetes = rbind(d1, d2, d3, d4, d44)
+
+diabetes$phase_strategy = paste0("phase-encoding\n", diabetes$phase_strategy)
+
+diabetes$phase_strategy[diabetes$model == 'HSGS'] = 'HSGS'
+
+aggregate(diabetes$avg_error, by=list(diabetes$phase_strategy), mean)
+
+ggplot(diabetes, aes(x=phase_strategy, y=avg_error, fill=phase_strategy)) + 
+  geom_boxplot()+
+  scale_fill_viridis(name = '', discrete = T)+
+  scale_y_continuous(limits = c(0,1))+
+  labs(x='Quantum Neuron Model', y="Error")+
+  theme_minimal()+ 
+  theme(legend.position = "none") 
+
+ggsave('results/diabetes.png', height = 4, width = 7, units = 'in')  
+
+
