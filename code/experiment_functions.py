@@ -49,6 +49,10 @@ def quantumNeuronFIT(Xs_train, ys_train, init_weight, lrParameter=0.09, threshol
         weightVectorHSGS = init_weight.copy()
         weightVectorPhaseEncoding = init_weight.copy()
 
+    
+    if phaseEstrategyOperator == 'angleradius':
+        weightVectorPhaseEncoding = weightVectorPhaseEncoding + [1]*2
+        
     #bestWeightHSGS = []
     #bestWeightPhaseEncoding = []
 
@@ -95,16 +99,17 @@ def quantumNeuronFIT(Xs_train, ys_train, init_weight, lrParameter=0.09, threshol
             if ("phase-encoding" in trainingApproaches):
                 operator = "phase-encoding"
                 
-
                 if phaseEstrategyOperator == 'angle':
-                    inputVector = [math.atan(inputVector[i]/inputVector[i+1]) for i in range(0, len(inputVector), 2)] + [0]*int(len(inputVector)/2)
+                    inputVector = [math.atan(inputVector[i]/inputVector[i+1]) for i in range(0, len(inputVector), 2)] + [np.sqrt(sum([i*i for i in inputVector])), math.asin(inputVector[-1]/np.sqrt(sum([i*i for i in inputVector])))] + [0]*(int(len(inputVector)/2) -2)
                 elif phaseEstrategyOperator == 'radius':
-                    inputVector = [math.sqrt(inputVector[i]**2 + inputVector[i+1]**2) for i in range(0, len(inputVector), 2)] + [0]*int(len(inputVector)/2)
+                    inputVector = [math.sqrt(inputVector[i]**2 + inputVector[i+1]**2) for i in range(0, len(inputVector), 2)] + [np.sqrt(sum([i*i for i in inputVector])), math.asin(inputVector[-1]/np.sqrt(sum([i*i for i in inputVector])))] + [0]*(int(len(inputVector)/2) - 2)
                 elif phaseEstrategyOperator == 'angleradius':
-                    inputVector = [math.sqrt(inputVector[i]**2 + inputVector[i+1]**2) for i in range(0, len(inputVector), 2)] + [math.atan(inputVector[i]/inputVector[i+1]) for i in range(0, len(inputVector), 2)] 
+                    inputVector = [math.sqrt(inputVector[i]**2 + inputVector[i+1]**2) for i in range(0, len(inputVector), 2)] + [math.atan(inputVector[i]/inputVector[i+1]) for i in range(0, len(inputVector), 2)] + [np.sqrt(sum([i*i for i in inputVector])), math.asin(inputVector[-1]/np.sqrt(sum([i*i for i in inputVector])))] 
     
                 neuronPhase = createNeuron(inputVector, weightVectorPhaseEncoding, operator)
                 resultadoPhaseEncoding = executeNeuron(neuronPhase, simulator, threshold=None)
+                #print('\ninput: ', inputVector)
+                #print('weight: ', weightVectorPhaseEncoding)
                 deltaRule(inputVector, weightVectorPhaseEncoding, lr=lrParameter, threshold=threshold, y_train=y_train, out=resultadoPhaseEncoding)
 
             """
@@ -198,11 +203,11 @@ def quantumNeuronPREDICT(Xs_test, ys_test, weightVectorsPhaseEncoding, weightVec
                 operator = 'phase-encoding'
                 
                 if phaseEstrategyOperator == 'angle':
-                    inputVector = [math.atan(inputVector[i]/inputVector[i+1]) for i in range(0, len(inputVector), 2)] + [0]*int(len(inputVector)/2)
+                    inputVector = [math.atan(inputVector[i]/inputVector[i+1]) for i in range(0, len(inputVector), 2)] + [np.sqrt(sum([i*i for i in inputVector])), math.asin(inputVector[-1]/np.sqrt(sum([i*i for i in inputVector])))] + [0]*(int(len(inputVector)/2) -2)
                 elif phaseEstrategyOperator == 'radius':
-                    inputVector = [math.sqrt(inputVector[i]**2 + inputVector[i+1]**2) for i in range(0, len(inputVector), 2)] + [0]*int(len(inputVector)/2)
+                    inputVector = [math.sqrt(inputVector[i]**2 + inputVector[i+1]**2) for i in range(0, len(inputVector), 2)] + [np.sqrt(sum([i*i for i in inputVector])), math.asin(inputVector[-1]/np.sqrt(sum([i*i for i in inputVector])))] + [0]*(int(len(inputVector)/2) - 2)
                 elif phaseEstrategyOperator == 'angleradius':
-                    inputVector = [math.sqrt(inputVector[i]**2 + inputVector[i+1]**2) for i in range(0, len(inputVector), 2)] + [math.atan(inputVector[i]/inputVector[i+1]) for i in range(0, len(inputVector), 2)]                 
+                    inputVector = [math.sqrt(inputVector[i]**2 + inputVector[i+1]**2) for i in range(0, len(inputVector), 2)] + [math.atan(inputVector[i]/inputVector[i+1]) for i in range(0, len(inputVector), 2)] + [np.sqrt(sum([i*i for i in inputVector])), math.asin(inputVector[-1]/np.sqrt(sum([i*i for i in inputVector])))]               
 
                 neuron = createNeuron(inputVector, weightVectorsPhaseEncoding, operator)
                 resultadoPhaseEncoding1 = executeNeuron(neuron, simulator, threshold=threshold)
