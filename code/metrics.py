@@ -4,17 +4,22 @@ from sklearn import metrics
 
 
 # import results and test targets
-#df = pd.read_csv('results/experiment_real_xor_v22.csv')
-df = pd.read_csv('results/experiment_xor_lite.csv')
 
+df = pd.concat([pd.read_csv('results/results_experiment_diabetes_original.csv'), 
+          pd.read_csv('results/results_experiment_diabetes_original_2.csv'),
+          pd.read_csv('results/results_experiment_diabetes_angle2.csv'),
+          pd.read_csv('results/results_experiment_diabetes_angleradius.csv'),
+          pd.read_csv('results/results_experiment_diabetes_radius.csv')])
+
+df.reset_index(inplace=True)
 
 #with open('results/version6/test_xor.json') as json_file:
-with open('results/version7/test_xor.json') as json_file:
+with open('results/version4/test_data.json') as json_file:
     y_test = json.load(json_file)[1]
 
 
 # get metrics
-y_true = y_test*10
+y_true = y_test*5
 get_metrics = {'precision_score':[], 'accuracy_score':[], 'recall_score':[], 'f1_score':[]}
 for i in range(len(df)):
     predicted = json.loads(df['neuron_outputs'][i])
@@ -56,4 +61,4 @@ results = results.drop([0, 1, 3])
 for i in results.columns[2:]:
     results[i] = round(results[i], 2)
 
-results.to_csv('results/results_table_xor.csv', index=False)
+results.to_csv('results/table_diabetes.csv', index=False)
