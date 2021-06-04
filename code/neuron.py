@@ -85,8 +85,8 @@ def createNeuron (inputVector, weightVector, circuitGeneratorOfUOperator, ancill
                 
 			inputVectorbin = deterministicBinarization(inputVector)
 			weightVectorbin = deterministicBinarization(weightVector)
-			inputVectorbin = [i*math.pi for i in inputVectorbin]
-			weightVectorbin = [-i*math.pi for i in weightVectorbin]
+			#inputVectorbin = [i*math.pi for i in inputVectorbin]
+			#weightVectorbin = [-i*math.pi for i in weightVectorbin]
             
 			hsgsGenerator(inputVectorbin, circuit, q_input, n)
 			hsgsGenerator(weightVectorbin, circuit, q_input, n)
