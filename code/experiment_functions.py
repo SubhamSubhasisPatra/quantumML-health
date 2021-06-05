@@ -86,7 +86,7 @@ def quantumNeuronFIT(Xs_train, ys_train, init_weight, lrParameter=0.09, threshol
             """
             if ("hsgs" in trainingApproaches):
                 operator = "hsgs"
-                
+                          
                 weightVectorHSGS_bin = deterministicBinarization(weightVectorHSGS) # Binarization of Real weights
                 neuronHSGS = createNeuron(inputVector, weightVectorHSGS_bin, operator)
                 resultadoHSGS = executeNeuron(neuronHSGS, simulator, threshold=None)
@@ -115,47 +115,53 @@ def quantumNeuronFIT(Xs_train, ys_train, init_weight, lrParameter=0.09, threshol
             """
             computar erros 
             """
+            if ("hsgs" in trainingApproaches):
+                if (resultadoHSGS > threshold):
+                    epoch_erroHSGS += abs(y_train - 1)
+                    errosHSGS.append((1, abs(y_train)))
+                else:
+                    epoch_erroHSGS += abs(y_train - 0)
+                    errosHSGS.append((0, y_train))
             
-            if (resultadoHSGS > threshold):
-                epoch_erroHSGS += abs(y_train - 1)
-                errosHSGS.append((1, abs(y_train)))
-            else:
-                epoch_erroHSGS += abs(y_train - 0)
-                errosHSGS.append((0, y_train))
-            
-            
-            if (resultadoPhaseEncoding > threshold):
-                epoch_erroPhaseEncoding += abs(y_train - 1)
-                errosPhaseEncoding.append((1, abs(y_train)))
-            else:
-                epoch_erroPhaseEncoding += abs(y_train - 0)
-                errosPhaseEncoding.append((0, y_train))
-            
-        epoch_evolutionHSGS.append(epoch_erroHSGS)
-        epoch_evolutionPhaseEncoding.append(epoch_erroPhaseEncoding)
-        
-        if (epoch_erroHSGS < bestErrorHSGS):
-            bestErrorHSGS = epoch_erroHSGS
-            best_epoch_errosHSGS = errosHSGS
-        
-        if (epoch_erroPhaseEncoding < bestErrorPhaseEncoding):
-            bestErrorPhaseEncoding = epoch_erroPhaseEncoding
-            best_epoch_errosPhaseEncoding = errosPhaseEncoding
+            if ("phase-encoding" in trainingApproaches):
+                if (resultadoPhaseEncoding > threshold):
+                    epoch_erroPhaseEncoding += abs(y_train - 1)
+                    errosPhaseEncoding.append((1, abs(y_train)))
+                else:
+                    epoch_erroPhaseEncoding += abs(y_train - 0)
+                    errosPhaseEncoding.append((0, y_train))
 
-        if epoch_results == True:    
-            print("\nerro HSGS", epoch_erroHSGS)
-            print("weights HSGS", weightVectorHSGS)
-            print("erro phase encoding", epoch_erroPhaseEncoding)
-            print("weights phase encoding", weightVectorPhaseEncoding)
+       
+        
+        if ("hsgs" in trainingApproaches):
+            epoch_evolutionHSGS.append(epoch_erroHSGS)
+            if (epoch_erroHSGS < bestErrorHSGS):
+                bestErrorHSGS = epoch_erroHSGS
+                best_epoch_errosHSGS = errosHSGS
+                
+        if ("phase-encoding" in trainingApproaches):
+            epoch_evolutionPhaseEncoding.append(epoch_erroPhaseEncoding)
+            if (epoch_erroPhaseEncoding < bestErrorPhaseEncoding):
+                bestErrorPhaseEncoding = epoch_erroPhaseEncoding
+                best_epoch_errosPhaseEncoding = errosPhaseEncoding
+
+        #if epoch_results == True:    
+        #    print("\nerro HSGS", epoch_erroHSGS)
+        #    print("weights HSGS", weightVectorHSGS)
+        #    print("erro phase encoding", epoch_erroPhaseEncoding)
+        #    print("weights phase encoding", weightVectorPhaseEncoding)
             
             
-        if epoch_erroPhaseEncoding == 0 and epoch_erroHSGS == 0:
-            print("\nbest error phase-encoding training: ", bestErrorPhaseEncoding)
-            print("best error HSGS training: ", bestErrorHSGS)
-            return [weightVectorPhaseEncoding, weightVectorHSGS, best_epoch_errosHSGS, best_epoch_errosPhaseEncoding, epoch_evolutionHSGS, epoch_evolutionPhaseEncoding]
+        #if epoch_erroPhaseEncoding == 0 and epoch_erroHSGS == 0:
+        #    print("\nbest error phase-encoding training: ", bestErrorPhaseEncoding)
+        #    print("best error HSGS training: ", bestErrorHSGS)
+        #    return [weightVectorPhaseEncoding, weightVectorHSGS, best_epoch_errosHSGS, best_epoch_errosPhaseEncoding, epoch_evolutionHSGS, epoch_evolutionPhaseEncoding]
     
-    print("\nbest error phase-encoding training: ", bestErrorPhaseEncoding)
-    print("best error HSGS training: ", bestErrorHSGS)
+    if ("phase-encoding" in trainingApproaches):
+        print("\nbest error phase-encoding training: ", bestErrorPhaseEncoding)
+    if ("hsgs" in trainingApproaches):
+        print("best error HSGS training: ", bestErrorHSGS)
+        
     return [weightVectorPhaseEncoding, weightVectorHSGS, best_epoch_errosHSGS, best_epoch_errosPhaseEncoding, epoch_evolutionHSGS, epoch_evolutionPhaseEncoding]
 
 
@@ -219,23 +225,23 @@ def quantumNeuronPREDICT(Xs_test, ys_test, weightVectorsPhaseEncoding, weightVec
             """
 
             # get predicted probability results to class 1
-            outputsHSGS.append(resultadoHSGS1)
-            outputsPhaseEncoding.append(resultadoPhaseEncoding1)
             y_targets.append(target)
             y_examples.append(Xs_test[pos])
 
-            
-            erroHSGS_bin = 0
-            if (resultadoHSGS1 != target):   
-                erroHSGS_bin = 1
+            if ("hsgs" in testingApproaches):
+                outputsHSGS.append(resultadoHSGS1)
+                erroHSGS_bin = 0
+                if (resultadoHSGS1 != target):   
+                    erroHSGS_bin = 1
+                erroHSGS += erroHSGS_bin####abs(resultadoHSGS_bin-y_train)
 
-            erroPhaseEncoding_bin = 0
-            if (resultadoPhaseEncoding1 != target):   
-                erroPhaseEncoding_bin = 1
+            if ("phase-encoding" in testingApproaches):
+                outputsPhaseEncoding.append(resultadoPhaseEncoding1)
+                erroPhaseEncoding_bin = 0
+                if (resultadoPhaseEncoding1 != target):   
+                    erroPhaseEncoding_bin = 1
+                erroPhaseEncoding += erroPhaseEncoding_bin####abs(resultadoEncoding_bin-y_train)
 
-            erroHSGS += erroHSGS_bin####abs(resultadoHSGS_bin-y_train)
-            erroPhaseEncoding += erroPhaseEncoding_bin####abs(resultadoEncoding_bin-y_train)
-            
             
         #acerto_HSGS_ = [1 if outputsHSGS[i] == y_targets[i] else 0 for i in range(len(y_targets))]
         #acerto_phase_ = [1 if outputsPhaseEncoding[i] == y_targets[i] else 0 for i in range(len(y_targets))]
@@ -243,12 +249,15 @@ def quantumNeuronPREDICT(Xs_test, ys_test, weightVectorsPhaseEncoding, weightVec
         #print("erro HSGS", erroHSGS/len(Xs_test))
         #print("erro phase encoding", erroPhaseEncoding/len(Xs_test))
 
-
-        errosHSGS.append(round(erroHSGS/len(Xs_test), 4))
-        errosPhaseEncoding.append(round(erroPhaseEncoding/len(Xs_test), 4))
-
-    print("AVG TEST ERROR HSGS   ",  np.average(errosHSGS))
-    print("AVG TEST ERROR PHASE  ",  np.average(errosPhaseEncoding))
+        if ("hsgs" in testingApproaches):
+            errosHSGS.append(round(erroHSGS/len(Xs_test), 4))
+        if ("phase-encoding" in testingApproaches):
+            errosPhaseEncoding.append(round(erroPhaseEncoding/len(Xs_test), 4))
+            
+    if ("hsgs" in testingApproaches):
+        print("AVG TEST ERROR HSGS   ",  np.average(errosHSGS))
+    if ("phase-encoding" in testingApproaches):
+        print("AVG TEST ERROR PHASE  ",  np.average(errosPhaseEncoding))
 
     """
     #results and metrics
