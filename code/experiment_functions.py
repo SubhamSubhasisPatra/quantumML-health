@@ -6,7 +6,7 @@ from code.sf import *
 simulator = Aer.get_backend('qasm_simulator')
 import pandas as pd
 import numpy as np
-
+import math
             
 '''
 AUXILIARY FUNCTIONS
@@ -53,8 +53,8 @@ def quantumNeuronFIT(Xs_train, ys_train, init_weight, lrParameter=0.09, threshol
     if phaseEstrategyOperator == 'angleradius':
         weightVectorPhaseEncoding = weightVectorPhaseEncoding + [1]*2
         
-    #bestWeightHSGS = []
-    #bestWeightPhaseEncoding = []
+    bestWeightHSGS = []
+    bestWeightPhaseEncoding = []
 
     bestErrorHSGS = 999999
     bestErrorPhaseEncoding = 999999
@@ -79,7 +79,10 @@ def quantumNeuronFIT(Xs_train, ys_train, init_weight, lrParameter=0.09, threshol
             
             if (trainingBias):
                 inputVector = inputVector + len(inputVector)*[1]
-
+                
+            if posicaoTreinamento % 2 == 0:
+                weightVectorPhaseEncoding = [math.tanh(i) for i in weightVectorPhaseEncoding]
+                
 
             """
             executando o HSGS
@@ -138,12 +141,14 @@ def quantumNeuronFIT(Xs_train, ys_train, init_weight, lrParameter=0.09, threshol
             if (epoch_erroHSGS < bestErrorHSGS):
                 bestErrorHSGS = epoch_erroHSGS
                 best_epoch_errosHSGS = errosHSGS
+                bestWeightHSGS = weightVectorHSGS.copy()
                 
         if ("phase-encoding" in trainingApproaches):
             epoch_evolutionPhaseEncoding.append(epoch_erroPhaseEncoding)
             if (epoch_erroPhaseEncoding < bestErrorPhaseEncoding):
                 bestErrorPhaseEncoding = epoch_erroPhaseEncoding
                 best_epoch_errosPhaseEncoding = errosPhaseEncoding
+                bestWeightPhaseEncoding = weightVectorPhaseEncoding.copy()
 
         #if epoch_results == True:    
         #    print("\nerro HSGS", epoch_erroHSGS)
