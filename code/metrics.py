@@ -22,14 +22,14 @@ with open('results/version6/test_nonlinear.json') as json_file:
     y_test = json.load(json_file)[1]
 
 # import results and test targets XOR dataset
-df = pd.concat([pd.read_csv('results/version7/experiment_nonlinear_phase.csv'), 
-          pd.read_csv('results/version7/experiment_nonlinear_hsgs.csv')])
+df = pd.concat([pd.read_csv('results/version7/experiment_XOR_hsgs.csv'), 
+          pd.read_csv('results/version7/experiment_XOR_phase.csv')])
 df.reset_index(inplace=True)
 with open('results/version7/test_xor.json') as json_file:
     y_test = json.load(json_file)[1]
 
 # get metrics
-y_true = y_test*10
+y_true = y_test*5
 get_metrics = {'precision_score':[], 'accuracy_score':[], 'recall_score':[], 'f1_score':[]}
 for i in range(len(df)):
     predicted = json.loads(df['neuron_outputs'][i])
@@ -71,4 +71,7 @@ results = results.drop([0, 1, 3])
 for i in results.columns[2:]:
     results[i] = round(results[i], 2)
 
-results.to_csv('results/table_non_linear.csv', index=False)
+results.to_csv('results/table_XOR.csv', index=False)
+
+
+df[df.phase_strategy == 'angleradius']
