@@ -84,6 +84,6 @@ results = pd.concat([a1, a2['best_accuracy_score'],
 for i in results.columns[2:]:
     results[i] = round(results[i], 2)
 
-results.to_csv('results/table_non_linear.csv', index=False)
+results.to_csv('results/table_XOR.csv', index=False)
 
 
