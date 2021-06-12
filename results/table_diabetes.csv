@@ -1,6 +1,6 @@
 model,phase_strategy,avg_accuracy_score,best_accuracy_score,min_accuracy_score,var_accuracy_score,best_precision_score,best_recall_score,best_f1_score
 HSGS,original,0.62,0.69,0.46,0.06,0.54,0.35,0.36
 phase-encoding,angle,0.64,0.68,0.51,0.06,0.56,0.58,0.5
-phase-encoding,angleradius,0.61,0.68,0.5,0.1,0.0,0.0,0.0
+phase-encoding,angleradius,0.67,0.68,0.5,0.02,0.0,0.0,0.0
 phase-encoding,original,0.6,0.72,0.3,0.14,1.0,0.96,0.48
 phase-encoding,radius,0.67,0.69,0.61,0.01,1.0,0.44,0.46

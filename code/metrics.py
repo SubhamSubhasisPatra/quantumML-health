@@ -11,6 +11,7 @@ df = pd.concat([pd.read_csv('results/version4/results_experiment_diabetes_origin
           pd.read_csv('results/version4/results_experiment_diabetes_radius.csv'),
           pd.read_csv('results/version4/experiment_diabetes_v2.csv'),
           pd.read_csv('results/version4/experiment_nonlinear_phase_vx.csv'),
+          pd.read_csv('results/version4/experiment_nonlinear_phase_vx2.csv')
           ])
 
 df = df[df.model != 'HSGS']
@@ -44,6 +45,7 @@ for i in range(len(df)):
         y_true = y_test*10
     elif len(predicted) == len(y_test*5):
         y_true = y_test*5
+    print('true: ', y_true, '\n', 'predicted: ', predicted)
     get_metrics['precision_score'].append(metrics.precision_score(y_true, predicted))
     get_metrics['accuracy_score'].append(metrics.accuracy_score(y_true, predicted))
     get_metrics['recall_score'].append(metrics.recall_score(y_true, predicted))
@@ -51,6 +53,7 @@ for i in range(len(df)):
 
 
 df = pd.concat([df, pd.DataFrame(get_metrics)], axis=1)
+
 
 a1 = pd.DataFrame(df[['model', 'phase_strategy', 'accuracy_score']].groupby(['model', 'phase_strategy']).mean()).reset_index()
 a2 = pd.DataFrame(df[['model', 'phase_strategy', 'accuracy_score']].groupby(['model', 'phase_strategy']).max()).reset_index()
@@ -84,6 +87,6 @@ results = pd.concat([a1, a2['best_accuracy_score'],
 for i in results.columns[2:]:
     results[i] = round(results[i], 2)
 
-results.to_csv('results/table_XOR.csv', index=False)
+results.to_csv('results/table_diabetes.csv', index=False)
 
 
