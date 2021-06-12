@@ -80,7 +80,7 @@ def quantumNeuronFIT(Xs_train, ys_train, init_weight, lrParameter=0.09, threshol
             if (trainingBias):
                 inputVector = inputVector + len(inputVector)*[1]
                 
-            if posicaoTreinamento % 2 == 0:
+            if posicaoTreinamento % 4 == 0:
                 weightVectorPhaseEncoding = [math.tanh(i) for i in weightVectorPhaseEncoding]
                 
 
