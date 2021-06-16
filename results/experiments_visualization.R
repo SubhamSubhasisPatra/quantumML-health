@@ -36,8 +36,16 @@ ggsave('results/xor-binary-models.png', height = 4, width = 7, units = 'in')
 
 ###----- epoch error
 
-xornobias = read_csv('results/epoch_error_xorlite_nobias.csv')
+xornobias = read_csv('results/epoch_error_xorlite_nobias.csv.txt')
 xornobias <- melt(setDT(xornobias), id.vars = c("X1","epoch"), variable.name = "model")
+xornobias$model <- as.character(xornobias$model)
+xornobias$model[xornobias$model == 'HSGS'] <- 'BQN'
+xornobias$model[xornobias$model == 'phase-encoding\nradius'] <- 'CVQN\nradius'
+xornobias$model[xornobias$model == 'phase-encoding\nangle'] <- 'CVQN\nangle'
+xornobias$model[xornobias$model == 'phase-encoding\nangleradius'] <- 'CVQN\nangle and radius'
+xornobias$model[xornobias$model == 'phase-encoding\noriginal'] <- 'CVQN\noriginal'
+
+
 p1 = ggplot(xornobias, aes(x=epoch, y=value, group=model, color=model)) +
   geom_line(size=1) +
   scale_color_viridis(discrete = TRUE) +
@@ -49,8 +57,15 @@ p1 = ggplot(xornobias, aes(x=epoch, y=value, group=model, color=model)) +
 
 p1
 
-xorbias = read_csv('results/epoch_error_xorlite_bias.csv')
+xorbias = read_csv('results/epoch_error_xorlite_bias.csv.txt')
 xorbias <- melt(setDT(xorbias), id.vars = c("X1","epoch"), variable.name = "model")
+xorbias$model <- as.character(xorbias$model)
+xorbias$model[xorbias$model == 'HSGS'] <- 'BQN'
+xorbias$model[xorbias$model == 'phase-encoding\nradius'] <- 'CVQN\nradius'
+xorbias$model[xorbias$model == 'phase-encoding\nangle'] <- 'CVQN\nangle'
+xorbias$model[xorbias$model == 'phase-encoding\nangleradius'] <- 'CVQN\nangle and radius'
+xorbias$model[xorbias$model == 'phase-encoding\noriginal'] <- 'CVQN\noriginal'
+
 p2 = ggplot(xorbias, aes(x=epoch, y=value, group=model, color=model)) +
   geom_line(size=1) +
   scale_color_viridis(discrete = TRUE) +
@@ -64,6 +79,55 @@ p2
 
 ggarrange(p1, p2, ncol = 1, nrow = 2, common.legend = T, legend='bottom')
 ggsave('results/xor-epoch.png', height = 5, width = 7, units = 'in')  
+
+
+###----- epoch error V2
+
+xornobias = read_csv('results/version7/error_by_epoch_nobias.csv')
+xornobias <- melt(setDT(xornobias), id.vars = c("X1","epoch"), variable.name = "model")
+xornobias$model <- as.character(xornobias$model)
+xornobias$model[xornobias$model == 'HSGS'] <- 'BQN'
+xornobias$model[xornobias$model == 'phase-encoding\nradius'] <- 'CVQN\nradius'
+xornobias$model[xornobias$model == 'phase-encoding\nangle'] <- 'CVQN\nangle'
+xornobias$model[xornobias$model == 'phase-encoding\nangleradius'] <- 'CVQN\nangle and radius'
+xornobias$model[xornobias$model == 'phase-encoding\noriginal'] <- 'CVQN\noriginal'
+
+
+p1 = ggplot(xornobias, aes(x=epoch, y=value, group=model, color=model)) +
+  geom_line(size=1) +
+  scale_color_viridis(discrete = TRUE) +
+  labs(x='Epoch', y="Epoch Error", title='Without Bias')+
+  theme_minimal()+
+  scale_y_continuous(limits=c(0,4))+
+  theme(legend.title = element_blank(), 
+        legend.text = element_text(size=11))+
+  guides(color = guide_legend(override.aes = list(size = 4) ) )
+
+p1
+
+xorbias = read_csv('results/version7/error_by_epoch_bias.csv')
+xorbias <- melt(setDT(xorbias), id.vars = c("X1","epoch"), variable.name = "model")
+xorbias$model <- as.character(xorbias$model)
+xorbias$model[xorbias$model == 'HSGS'] <- 'BQN'
+xorbias$model[xorbias$model == 'phase-encoding\nradius'] <- 'CVQN\nradius'
+xorbias$model[xorbias$model == 'phase-encoding\nangle'] <- 'CVQN\nangle'
+xorbias$model[xorbias$model == 'phase-encoding\nangleradius'] <- 'CVQN\nangle and radius'
+xorbias$model[xorbias$model == 'phase-encoding\noriginal'] <- 'CVQN\noriginal'
+
+p2 = ggplot(xorbias, aes(x=epoch, y=value, group=model, color=model)) +
+  geom_line(size=1) +
+  scale_color_viridis(discrete = TRUE) +
+  labs(x='Epoch', y="Epoch Error", title='With Bias')+
+  theme_minimal() +
+  theme(legend.title = element_blank(), 
+        legend.text = element_text(size=11))+
+  guides(color = guide_legend(override.aes = list(size = 4)) )
+
+p2
+
+ggarrange(p1, p2, ncol = 1, nrow = 2, common.legend = T, legend='bottom')
+ggsave('results/xor-epoch.png', height = 5, width = 7, units = 'in')  
+
 
 #==============
 # xor real
