@@ -168,7 +168,7 @@ def quantumNeuronFIT(Xs_train, ys_train, init_weight, lrParameter=0.09, threshol
     if ("hsgs" in trainingApproaches):
         print("best error HSGS training: ", bestErrorHSGS)
         
-    return [bestWeightPhaseEncoding, bestWeightHSGS, best_epoch_errosHSGS, best_epoch_errosPhaseEncoding, epoch_evolutionHSGS, epoch_evolutionPhaseEncoding]
+    return [weightVectorPhaseEncoding, weightVectorHSGS, best_epoch_errosHSGS, best_epoch_errosPhaseEncoding, epoch_evolutionHSGS, epoch_evolutionPhaseEncoding]
 
 
 def quantumNeuronPREDICT(Xs_test, ys_test, weightVectorsPhaseEncoding, weightVectorsHSGS,  threshold=0.5, repeat=30, bias=True, testingApproaches={}, phaseEstrategyOperator = 'phase-encoding-phase'):
