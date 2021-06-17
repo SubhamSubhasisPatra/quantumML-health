@@ -40,4 +40,4 @@ p2 = ggplot(xorbias, aes(x=epoch, y=value, group=model, color=model)) +
 p2
 
 ggarrange(p1, p2, ncol = 1, nrow = 2, common.legend = T, legend='bottom')
-ggsave('results/xor-epoch.png', height = 5, width = 7, units = 'in')  
+ggsave('data_and_results/XOR/xor-epoch.png', height = 5, width = 7, units = 'in')  
