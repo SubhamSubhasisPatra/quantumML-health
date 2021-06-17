@@ -33,12 +33,13 @@ def inverterSinalPeso(w):
 EXPERIMENT FUNCTIONS
 '''
 
-def quantumNeuronFIT(Xs_train, ys_train, init_weight, lrParameter=0.09, threshold=0.5, n_epochs=400, trainingBias=True, trainingApproaches={}, epoch_results = False, phaseEstrategyOperator = 'phase-encoding-phase'):
+def quantumNeuronFIT(Xs_train, ys_train, init_weight, lrParameter=0.09, threshold=0.5, n_epochs=400, trainingBias=True, trainingApproaches={}, epoch_results = False, phaseEstrategyOperator = 'phase-encoding-phase', tanh=False):
     
     print('lrParameter: ', lrParameter)
     print('threshold: ', threshold)
     print('trainingBias: ', trainingBias)
-    print('phaseEstrategyOperator: ', phaseEstrategyOperator)
+    if phaseEstrategyOperator != 'phase-encoding-phase':
+        print('phaseEstrategyOperator: ', phaseEstrategyOperator)
 
     input_dim = len(Xs_train[0])
 
@@ -80,7 +81,7 @@ def quantumNeuronFIT(Xs_train, ys_train, init_weight, lrParameter=0.09, threshol
             if (trainingBias):
                 inputVector = inputVector + len(inputVector)*[1]
                 
-            if posicaoTreinamento % 4 == 0:
+            if tanh == True:
                 weightVectorPhaseEncoding = [math.tanh(i) for i in weightVectorPhaseEncoding]
                 
 
@@ -167,7 +168,7 @@ def quantumNeuronFIT(Xs_train, ys_train, init_weight, lrParameter=0.09, threshol
     if ("hsgs" in trainingApproaches):
         print("best error HSGS training: ", bestErrorHSGS)
         
-    return [weightVectorPhaseEncoding, weightVectorHSGS, best_epoch_errosHSGS, best_epoch_errosPhaseEncoding, epoch_evolutionHSGS, epoch_evolutionPhaseEncoding]
+    return [bestWeightPhaseEncoding, bestWeightHSGS, best_epoch_errosHSGS, best_epoch_errosPhaseEncoding, epoch_evolutionHSGS, epoch_evolutionPhaseEncoding]
 
 
 def quantumNeuronPREDICT(Xs_test, ys_test, weightVectorsPhaseEncoding, weightVectorsHSGS,  threshold=0.5, repeat=30, bias=True, testingApproaches={}, phaseEstrategyOperator = 'phase-encoding-phase'):
@@ -261,8 +262,10 @@ def quantumNeuronPREDICT(Xs_test, ys_test, weightVectorsPhaseEncoding, weightVec
             
     if ("hsgs" in testingApproaches):
         print("AVG TEST ERROR HSGS   ",  np.average(errosHSGS))
+        print("MIN TEST ERROR HSGS   ",  np.min(errosHSGS))
     if ("phase-encoding" in testingApproaches):
         print("AVG TEST ERROR PHASE  ",  np.average(errosPhaseEncoding))
+        print("MIN TEST ERROR PHASE  ",  np.min(errosPhaseEncoding))
 
     """
     #results and metrics
