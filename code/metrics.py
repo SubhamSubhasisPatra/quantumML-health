@@ -4,37 +4,22 @@ from sklearn import metrics
 
 
 # import results and test targets DIABETES
-df = pd.concat([pd.read_csv('results/version4/results_experiment_diabetes_original.csv'), 
-          pd.read_csv('results/version4/results_experiment_diabetes_original_2.csv'),
-          pd.read_csv('results/version4/results_experiment_diabetes_angle2.csv'),
-          pd.read_csv('results/version4/results_experiment_diabetes_angleradius.csv'),
-          pd.read_csv('results/version4/results_experiment_diabetes_radius.csv'),
-          pd.read_csv('results/version4/experiment_diabetes_v2.csv'),
-          pd.read_csv('results/version4/experiment_nonlinear_phase_vx.csv'),
-          pd.read_csv('results/version4/experiment_nonlinear_phase_vx2.csv')
-          ])
-
-df = df[df.model != 'HSGS']
-
-df = pd.concat([pd.read_csv('results/version4/experiment_diabetes_hsgs.csv'), df])
-
-df.reset_index(inplace=True)
-with open('results/version4/test_data.json') as json_file:
+df = pd.read_csv('data_and_results/diabetes/experiments_diabetes.csv')
+with open('data_and_results/diabetes//test_data.json') as json_file:
     y_test = json.load(json_file)[1]
+
 
 # import results and test targets NON-LINEAR dataset
-df = pd.concat([pd.read_csv('results/version6/experiment_nonlinear_phase_tanh.csv'), 
-          #pd.read_csv('results/version6/experiment_non_linear_v2.csv'),
-          pd.read_csv('results/version6/experiment_nonlinear_hsgs.csv')])
-df.reset_index(inplace=True)
-with open('results/version6/test_nonlinear.json') as json_file:
+df = pd.read_csv('data_and_results/non_linear/experiments_non_linear.csv')
+with open('data_and_results/non_linear/test_nonlinear.json') as json_file:
     y_test = json.load(json_file)[1]
 
+
 # import results and test targets XOR dataset
-df = pd.concat([pd.read_csv('results/version7/experiment_XOR_hsgs.csv'), 
-          pd.read_csv('results/version7/experiment_XOR_phase.csv')])
+df = pd.concat([pd.read_csv('data_and_results/XOR/experiment_XOR_hsgs.csv'), 
+          pd.read_csv('data_and_results/XOR/experiment_XOR_phase.csv')])
 df.reset_index(inplace=True)
-with open('results/version7/test_xor.json') as json_file:
+with open('data_and_results/XOR/test_xor.json') as json_file:
     y_test = json.load(json_file)[1]
 
 # get metrics
@@ -45,7 +30,6 @@ for i in range(len(df)):
         y_true = y_test*10
     elif len(predicted) == len(y_test*5):
         y_true = y_test*5
-    print('true: ', y_true, '\n', 'predicted: ', predicted)
     get_metrics['precision_score'].append(metrics.precision_score(y_true, predicted))
     get_metrics['accuracy_score'].append(metrics.accuracy_score(y_true, predicted))
     get_metrics['recall_score'].append(metrics.recall_score(y_true, predicted))
@@ -62,9 +46,6 @@ a4 = pd.DataFrame(df[['model', 'phase_strategy', 'accuracy_score']].groupby(['mo
 b1 = pd.DataFrame(df[['model', 'phase_strategy', 'precision_score']].groupby(['model', 'phase_strategy']).max()).reset_index()
 c1 = pd.DataFrame(df[['model', 'phase_strategy', 'recall_score']].groupby(['model', 'phase_strategy']).max()).reset_index()
 d1 = pd.DataFrame(df[['model', 'phase_strategy', 'f1_score']].groupby(['model', 'phase_strategy']).max()).reset_index()
-
-
-#df.sort_values('f1_score')
 
 
 a1.columns = ['model', 'phase_strategy', 'avg_accuracy_score']
@@ -87,6 +68,6 @@ results = pd.concat([a1, a2['best_accuracy_score'],
 for i in results.columns[2:]:
     results[i] = round(results[i], 2)
 
-results.to_csv('results/table_diabetes.csv', index=False)
+results.to_csv('data_and_results/table_XOR.csv', index=False)
 
 
