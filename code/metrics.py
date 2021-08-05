@@ -22,7 +22,7 @@ with open('data_and_results/non_linear/test_nonlinear.json') as json_file:
 df = pd.concat([pd.read_csv('data_and_results/XOR/experiment_XOR_hsgs.csv'), 
           pd.read_csv('data_and_results/XOR/experiment_XOR_phase.csv')])
 df.reset_index(inplace=True)
-#df =  pd.read_csv('data_and_results/XOR/experiment_XOR_encoding.csv') ##########
+df =  pd.read_csv('data_and_results/XOR/experiment_XOR_encoding.csv') ##########
 
 with open('data_and_results/XOR/test_xor.json') as json_file:
     y_test = json.load(json_file)[1]
@@ -38,7 +38,7 @@ len(y_test)
 # get metrics
 get_metrics = {'precision_score':[], 'accuracy_score':[], 'recall_score':[], 'f1_score':[]}
 for i in range(len(df)):
-    predicted = json.loads(df['neuron_outputs'][i])
+    predicted = json.loads(df['neuron_outputs'][i])[0:40]
     if len(predicted) == len(y_test*10):
         y_true = y_test*10
     elif len(predicted) == len(y_test*5):
@@ -86,6 +86,6 @@ results = pd.concat([a1, a2['best_accuracy_score'],
 for i in results.columns[2:]:
     results[i] = round(results[i], 2)
 
-results.to_csv('data_and_results/table_diabetes_encoding.csv', index=False)
+results.to_csv('data_and_results/table_XOR_encoding.csv', index=False)
 
 
