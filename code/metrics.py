@@ -2,15 +2,18 @@ import pandas as pd
 import json
 from sklearn import metrics
 
-
 # import results and test targets DIABETES
 df = pd.read_csv('data_and_results/diabetes/experiments_diabetes.csv')
+df =  pd.read_csv('data_and_results/diabetes/experiments_diabetes_encoding.csv') ##########
+
 with open('data_and_results/diabetes//test_data.json') as json_file:
     y_test = json.load(json_file)[1]
 
 
 # import results and test targets NON-LINEAR dataset
 df = pd.read_csv('data_and_results/non_linear/experiments_non_linear.csv')
+df = pd.read_csv('data_and_results/non_linear/experiments_nonlinear_encoding.csv')
+
 with open('data_and_results/non_linear/test_nonlinear.json') as json_file:
     y_test = json.load(json_file)[1]
 
@@ -19,8 +22,18 @@ with open('data_and_results/non_linear/test_nonlinear.json') as json_file:
 df = pd.concat([pd.read_csv('data_and_results/XOR/experiment_XOR_hsgs.csv'), 
           pd.read_csv('data_and_results/XOR/experiment_XOR_phase.csv')])
 df.reset_index(inplace=True)
+#df =  pd.read_csv('data_and_results/XOR/experiment_XOR_encoding.csv') ##########
+
 with open('data_and_results/XOR/test_xor.json') as json_file:
     y_test = json.load(json_file)[1]
+
+
+#######
+# EXECUTE METRICS
+#######
+
+len(json.loads(df['neuron_outputs'][0]))
+len(y_test)
 
 # get metrics
 get_metrics = {'precision_score':[], 'accuracy_score':[], 'recall_score':[], 'f1_score':[]}
@@ -30,6 +43,8 @@ for i in range(len(df)):
         y_true = y_test*10
     elif len(predicted) == len(y_test*5):
         y_true = y_test*5
+    else:
+        y_true = y_test
     get_metrics['precision_score'].append(metrics.precision_score(y_true, predicted))
     get_metrics['accuracy_score'].append(metrics.accuracy_score(y_true, predicted))
     get_metrics['recall_score'].append(metrics.recall_score(y_true, predicted))
@@ -37,6 +52,9 @@ for i in range(len(df)):
 
 
 df = pd.concat([df, pd.DataFrame(get_metrics)], axis=1)
+
+#df['precision_score'] = df['precision_score'].replace(1.0, 0.0)
+#df['recall_score'] = df['recall_score'].replace(1.0, 0.0)
 
 
 a1 = pd.DataFrame(df[['model', 'phase_strategy', 'accuracy_score']].groupby(['model', 'phase_strategy']).mean()).reset_index()
@@ -68,6 +86,6 @@ results = pd.concat([a1, a2['best_accuracy_score'],
 for i in results.columns[2:]:
     results[i] = round(results[i], 2)
 
-results.to_csv('data_and_results/table_XOR.csv', index=False)
+results.to_csv('data_and_results/table_diabetes_encoding.csv', index=False)
 
 
