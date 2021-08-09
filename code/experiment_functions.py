@@ -208,8 +208,7 @@ def quantumNeuronPREDICT(Xs_test, ys_test, weightVectorsPhaseEncoding, weightVec
                 operator = "hsgs"
                 wBinaryBinary = deterministicBinarization(weightVectorsHSGS) # Binarization of Real weights
                 neuron = createNeuron(inputVector, wBinaryBinary, operator)
-                resultadoHSGS1 = executeNeuron(neuron, simulator, threshold=threshold)
-
+                resultadoHSGS1 = executeNeuron(neuron, simulator, threshold=None)
 
             if ("phase-encoding" in testingApproaches):
                 operator = 'phase-encoding'
@@ -222,32 +221,30 @@ def quantumNeuronPREDICT(Xs_test, ys_test, weightVectorsPhaseEncoding, weightVec
                     inputVector = [math.sqrt(inputVector[i]**2 + inputVector[i+1]**2) for i in range(0, len(inputVector), 2)] + [math.atan(inputVector[i]/inputVector[i+1]) for i in range(0, len(inputVector), 2)] + [np.sqrt(sum([i*i for i in inputVector])), math.asin(inputVector[-1]/np.sqrt(sum([i*i for i in inputVector])))]               
 
                 neuron = createNeuron(inputVector, weightVectorsPhaseEncoding, operator)
-                resultadoPhaseEncoding1 = executeNeuron(neuron, simulator, threshold=threshold)
-
-
-
+                resultadoPhaseEncoding1 = executeNeuron(neuron, simulator, threshold=None)
+                
+            if ("hsgs" in testingApproaches):
+                outputsHSGS.append(resultadoHSGS1)
+            if ("phase-encoding" in testingApproaches):
+                outputsPhaseEncoding.append(resultadoPhaseEncoding1)
             """
             erros
-            """
 
             # get predicted probability results to class 1
             y_targets.append(target)
             y_examples.append(Xs_test[pos])
 
             if ("hsgs" in testingApproaches):
-                outputsHSGS.append(resultadoHSGS1)
                 erroHSGS_bin = 0
                 if (resultadoHSGS1 != target):   
                     erroHSGS_bin = 1
                 erroHSGS += erroHSGS_bin####abs(resultadoHSGS_bin-y_train)
 
             if ("phase-encoding" in testingApproaches):
-                outputsPhaseEncoding.append(resultadoPhaseEncoding1)
                 erroPhaseEncoding_bin = 0
                 if (resultadoPhaseEncoding1 != target):   
                     erroPhaseEncoding_bin = 1
                 erroPhaseEncoding += erroPhaseEncoding_bin####abs(resultadoEncoding_bin-y_train)
-
             
         #acerto_HSGS_ = [1 if outputsHSGS[i] == y_targets[i] else 0 for i in range(len(y_targets))]
         #acerto_phase_ = [1 if outputsPhaseEncoding[i] == y_targets[i] else 0 for i in range(len(y_targets))]
@@ -266,7 +263,7 @@ def quantumNeuronPREDICT(Xs_test, ys_test, weightVectorsPhaseEncoding, weightVec
     if ("phase-encoding" in testingApproaches):
         print("AVG TEST ERROR PHASE  ",  np.average(errosPhaseEncoding))
         print("MIN TEST ERROR PHASE  ",  np.min(errosPhaseEncoding))
-
+            """ # REMOVE THIS
     """
     #results and metrics
     
@@ -281,4 +278,5 @@ def quantumNeuronPREDICT(Xs_test, ys_test, weightVectorsPhaseEncoding, weightVec
         }
     
     """
-    return  np.average(errosPhaseEncoding), outputsPhaseEncoding, weightVectorsPhaseEncoding, np.average(errosHSGS), outputsHSGS,  weightVectorsHSGS, y_targets, y_examples
+    #return  np.average(errosPhaseEncoding), outputsPhaseEncoding, weightVectorsPhaseEncoding, np.average(errosHSGS), outputsHSGS,  weightVectorsHSGS, y_targets, y_examples
+    return outputsPhaseEncoding, outputsHSGS
