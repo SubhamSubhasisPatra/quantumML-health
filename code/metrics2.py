@@ -5,34 +5,32 @@ from scipy import stats
 import numpy as np
 
 # import results and test targets DIABETES
-df = pd.read_csv('data_and_results/diabetes/experiments_diabetes.csv')
-df =  pd.read_csv('data_and_results/diabetes/diabetes_probs_hsgs.csv') ##########
+df =  pd.read_csv('data_and_results/diabetes/diabetes_probs.csv') ##########
+df.reset_index(inplace=True)
 
 with open('data_and_results/diabetes//test_data.json') as json_file:
     y_test = json.load(json_file)[1]
 
 
 # import results and test targets NON-LINEAR dataset
-df = pd.read_csv('data_and_results/non_linear/experiments_non_linear.csv')
-df = pd.read_csv('data_and_results/non_linear/experiments_nonlinear_encoding.csv')
+df = pd.read_csv('data_and_results/non_linear/experiments_nonlinear_probs.csv')
+df.reset_index(inplace=True)
 
 with open('data_and_results/non_linear/test_nonlinear.json') as json_file:
     y_test = json.load(json_file)[1]
 
 
 # import results and test targets XOR dataset
-df = pd.concat([pd.read_csv('data_and_results/XOR/experiment_XOR_hsgs.csv'), 
-          pd.read_csv('data_and_results/XOR/experiment_XOR_phase.csv')])
+df =  pd.read_csv('data_and_results/XOR/experiments_XOR_probs.csv') 
 df.reset_index(inplace=True)
-df =  pd.read_csv('data_and_results/XOR/experiment_XOR_encoding.csv') ##########
 
 with open('data_and_results/XOR/test_xor.json') as json_file:
     y_test = json.load(json_file)[1]
 
 
-#######
-# EXECUTE METRICS
-#######
+
+#=============== GET METRICS
+
 
 #len(json.loads(df['neuron_outputs'][0]))
 #len(y_test*5)
@@ -67,7 +65,7 @@ df = pd.concat([df, pd.DataFrame(get_metrics)], axis=1)
 a1 = pd.DataFrame(df[['model', 'phase_strategy', 'roc_auc_score']].groupby(['model', 'phase_strategy']).max()).reset_index()
 b1 = pd.DataFrame(df[['model', 'phase_strategy', 'top_k_accuracy_score']].groupby(['model', 'phase_strategy']).max()).reset_index()
 c1 = pd.DataFrame(df[['model', 'phase_strategy', 'KS']].groupby(['model', 'phase_strategy']).max()).reset_index()
-d1 = pd.DataFrame(df[['model', 'phase_strategy', 'KS_pvalue']].groupby(['model', 'phase_strategy']).max()).reset_index()
+d1 = pd.DataFrame(df[['model', 'phase_strategy', 'KS_pvalue']].groupby(['model', 'phase_strategy']).min()).reset_index()
 
 
 a1.columns = ['model', 'phase_strategy', 'best_roc_auc_score']
@@ -85,6 +83,6 @@ results = pd.concat([a1,
 for i in results.columns[2:]:
     results[i] = round(results[i], 2)
 
-results.to_csv('data_and_results/table_diabetes_metrics2.csv', index=False)
+results.to_csv('data_and_results/table_nonlinear_metrics2.csv', index=False)
 
 
