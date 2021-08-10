@@ -21,7 +21,7 @@ with open('data_and_results/non_linear/test_nonlinear.json') as json_file:
 
 
 # import results and test targets XOR dataset
-df =  pd.read_csv('data_and_results/XOR/experiments_XOR_probs (2).csv') 
+df =  pd.read_csv('data_and_results/XOR/experiments_XOR_probs.csv') 
 df.reset_index(inplace=True)
 
 with open('data_and_results/XOR/test_xor.json') as json_file:
