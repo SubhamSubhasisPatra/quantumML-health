@@ -9,9 +9,8 @@ library(viridis)
 library(data.table)
 
 
-
-
-xornobias = read_csv('data_and_results/XOR/error_by_epoch_nobias.csv')
+xornobias = rbind(read_csv('data_and_results/XOR/error_by_epoch_nobias.csv'), 
+                  read_csv('data_and_results/XOR/error_by_epoch_nobias_encoding.csv')[1:60,])
 
 
 p1 = ggplot(xornobias, aes(x=epoch, y=value, group=model, color=model)) +
@@ -26,7 +25,8 @@ p1 = ggplot(xornobias, aes(x=epoch, y=value, group=model, color=model)) +
 p1
 
 
-xorbias = read_csv('data_and_results/XOR/error_by_epoch_bias.csv')
+xorbias = rbind(read_csv('data_and_results/XOR/error_by_epoch_bias.csv'), 
+                  read_csv('data_and_results/XOR/error_by_epoch_bias_encoding.csv')[1:60,])
 
 p2 = ggplot(xorbias, aes(x=epoch, y=value, group=model, color=model)) +
   geom_line(size=1) +
