@@ -1,0 +1,7 @@
+model,phase_strategy,best_roc_auc_score,best_top_k_accuracy_score,best_KS,best_KS_pvalue
+Encoding,original,0.56,1.0,0.3,0.79
+HSGS,original,1.0,1.0,1.0,0.0
+phase-encoding,angle,1.0,1.0,1.0,0.0
+phase-encoding,angleradius,1.0,1.0,1.0,0.0
+phase-encoding,original,0.8,1.0,0.7,0.01
+phase-encoding,radius,0.8,1.0,0.6,0.05

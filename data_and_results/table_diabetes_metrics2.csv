@@ -1,0 +1,2 @@
+model,phase_strategy,best_roc_auc_score,best_top_k_accuracy_score,best_KS,best_KS_pvalue
+HSGS,original,0.57,1.0,0.29,0.32
