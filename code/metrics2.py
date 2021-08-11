@@ -5,7 +5,7 @@ from scipy import stats
 import numpy as np
 
 # import results and test targets DIABETES
-df =  pd.read_csv('data_and_results/diabetes/diabetes_probs.csv') ##########
+df =  pd.read_csv('data_and_results/diabetes/diabetes_probs_hsgs.csv') ##########
 df.reset_index(inplace=True)
 
 with open('data_and_results/diabetes//test_data.json') as json_file:
