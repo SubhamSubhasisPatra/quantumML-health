@@ -83,13 +83,13 @@ def createNeuron (inputVector, weightVector, circuitGeneratorOfUOperator, ancill
 			for i in range(n):
 				circuit.h(q_input[i])
                 
-			inputVectorbin = deterministicBinarization(inputVector)
-			weightVectorbin = deterministicBinarization(weightVector)
-			inputVectorbin = [i*math.pi for i in inputVectorbin]
-			weightVectorbin = [-i*math.pi for i in weightVectorbin]
+			#inputVectorbin = deterministicBinarization(inputVector)
+			#weightVectorbin = deterministicBinarization(weightVector)
+			#inputVectorbin = [i*math.pi for i in inputVectorbin]
+			#weightVectorbin = [-i*math.pi for i in weightVectorbin]
             
-			hsgsGenerator(inputVectorbin, circuit, q_input, n)
-			hsgsGenerator(weightVectorbin, circuit, q_input, n)
+			hsgsGenerator(inputVector, circuit, q_input, n)
+			hsgsGenerator(weightVector, circuit, q_input, n)
 
             
 	elif circuitGeneratorOfUOperator == "sf":
@@ -126,7 +126,7 @@ def createNeuron (inputVector, weightVector, circuitGeneratorOfUOperator, ancill
 
 
 def executeNeuron(neuronQuantumCircuit, simulator, threshold=None, nshots=8192):
-    from qiskit.tools.visualization import plot_histogram
+    #from qiskit.tools.visualization import plot_histogram
 	#neuronQuantumCircuit is the return of the function createNeuron
 	#simulator function of a qiskit quantum simulator
 	#expectedOutput is a Python List with expected value
@@ -151,7 +151,7 @@ def executeNeuron(neuronQuantumCircuit, simulator, threshold=None, nshots=8192):
 
     # Utilizando threshold
     if (threshold == None):
-        return results1/nshots #, plot_histogram(count, title='Experiment')
+        return results1/nshots#, plot_histogram(count, title='Experiment')
     else:
         if (results1/nshots) >= threshold:
             neuronOutput = 1
