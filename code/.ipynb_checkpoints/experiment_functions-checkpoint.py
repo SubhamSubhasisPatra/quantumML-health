@@ -180,6 +180,9 @@ def quantumNeuronPREDICT(Xs_test, ys_test, weightVectorsPhaseEncoding, weightVec
     outputsHSGS = []
     outputsPhaseEncoding = []
     
+    sizeHSGS = []
+    sizePhaseEncoding = []
+    
     y_targets =[]
     y_examples =[]
 
@@ -225,8 +228,10 @@ def quantumNeuronPREDICT(Xs_test, ys_test, weightVectorsPhaseEncoding, weightVec
                 
             if ("hsgs" in testingApproaches):
                 outputsHSGS.append(resultadoHSGS1)
+                sizeHSGS.append(neuron.size())
             if ("phase-encoding" in testingApproaches):
                 outputsPhaseEncoding.append(resultadoPhaseEncoding1)
+                sizePhaseEncoding.append(neuron.size())
             """
             erros
 
@@ -279,4 +284,4 @@ def quantumNeuronPREDICT(Xs_test, ys_test, weightVectorsPhaseEncoding, weightVec
     
     """
     #return  np.average(errosPhaseEncoding), outputsPhaseEncoding, weightVectorsPhaseEncoding, np.average(errosHSGS), outputsHSGS,  weightVectorsHSGS, y_targets, y_examples
-    return outputsPhaseEncoding, outputsHSGS
+    return outputsPhaseEncoding, outputsHSGS, sizePhaseEncoding, sizeHSGS
