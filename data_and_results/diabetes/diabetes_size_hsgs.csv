@@ -1,1 +1,1 @@
-model,phase_strategy,threshold,bias,lr,initial_weights,neuron_outputs,circuit_size
+model,phase_strategy,bias,threshold,lr,initial_weights,neuron_outputs,circuit_size
