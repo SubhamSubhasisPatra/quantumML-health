@@ -2,3 +2,9 @@
 .Rhistory
 .RData
 .Ruserdata
+
+**/.idea/**
+**/.ipynb_checkpoints/**
+**/myenv/**
+**/__pycache__/**
+**/.vscode/**
